@@ -4,3 +4,6 @@
 [submodule "lib/Adafruit_ILI9341"]
 	path = lib/Adafruit_ILI9341
 	url = git@github.com:malachib/Adafruit_ILI9341.git
+[submodule "lib/Adafruit_STMPE610"]
+	path = lib/Adafruit_STMPE610
+	url = https://github.com/adafruit/Adafruit_STMPE610.git
