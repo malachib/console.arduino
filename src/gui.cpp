@@ -27,4 +27,7 @@ void GUIService::begin()
   if (!ts.begin()) {
     tft.println("Couldn't start touchscreen controller");
   }
+
+  pinMode(7, OUTPUT);
+  digitalWrite(7, HIGH);
 }
