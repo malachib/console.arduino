@@ -2,6 +2,7 @@
 
 #include "gui.h"
 #include "gfx_touch.h"
+#include <fact/lib.h>
 
 
 // turns out my Adafruit doesn't have SPI touch screen breakout (looks like clone does thoough,
@@ -12,8 +13,8 @@
 #ifdef ANALOG_TOUCHSCREEN
 #define YP A2  // must be an analog pin, use "An" notation!
 #define XM A3  // must be an analog pin, use "An" notation!
-#define YM 8   // can be a digital pin
-#define XP 9   // can be a digital pin
+#define YM 5   // can be a digital pin
+#define XP 4   // can be a digital pin
 
 // For better pressure precision, we need to know the resistance
 // between X+ and X- Use any multimeter to read it
@@ -68,6 +69,11 @@ void TouchService::stateHandler()
   // pressure of 0 means no pressing!
   if (p.z > ts.pressureThreshhold)
   {
+#ifdef DEBUG
+    Serial << F("Touch found at: ") << p.x << ',' << p.y << ',' << p.z;
+    Serial.println();
+#endif
+
     isPressed = true;
     // this is a "release" (aka mouseup) event
     Region* r = regionResponder->find(p);
@@ -102,5 +108,7 @@ void TouchService::stateHandler()
 
 Vector3D AnalogTouchService::getPoint()
 {
-  return ts.getPoint();
+  auto p = ts.getPoint();
+
+  return p;
 }
