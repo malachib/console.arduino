@@ -62,6 +62,9 @@ void GUIService::stateHandler()
   while(monitor.stream->available())
   {
     int ch = monitor.stream->read();
-    tft.print((char)ch);
+    if(ch == 13)
+      tft.println();
+    else
+      tft.print((char)ch);
   }
 }

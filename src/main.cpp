@@ -10,5 +10,5 @@ void setup()
 
 void loop()
 {
-
+  gui.stateHandler();
 }

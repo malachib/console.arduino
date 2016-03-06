@@ -1,11 +1,17 @@
 #pragma once
 
+template <class TStream>
 class MonitorService
 {
 public:
-  static void begin();
-
-  static Stream* stream;
+  static TStream* stream;
 };
 
-extern MonitorService monitor;
+class SerialMonitorService :
+  public MonitorService<HardwareSerial>
+{
+public:
+  static void begin();
+};
+
+extern SerialMonitorService monitor;

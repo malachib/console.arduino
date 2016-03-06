@@ -1,15 +1,18 @@
 #include <Arduino.h>
 #include "monitor.h"
 
-MonitorService monitor;
+SerialMonitorService monitor;
 
-Stream* MonitorService::stream;
+template <class TStream>
+TStream* MonitorService<TStream>::stream;
 
-void MonitorService::begin()
+void SerialMonitorService::begin()
 {
-#if SAMD_SERIES
-  stream = &Serial1;
-#else
-  stream = &Serial;
-#endif
+  #if SAMD_SERIES
+    stream = &Serial1;
+  #else
+    stream = &Serial;
+  #endif
+
+  stream->begin(115200);
 }
