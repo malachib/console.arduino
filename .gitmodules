@@ -7,3 +7,6 @@
 [submodule "lib/Adafruit_STMPE610"]
 	path = lib/Adafruit_STMPE610
 	url = https://github.com/adafruit/Adafruit_STMPE610.git
+[submodule "lib/Touch-Screen-Library"]
+	path = lib/Touch-Screen-Library
+	url = https://github.com/adafruit/Touch-Screen-Library.git

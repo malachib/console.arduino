@@ -1,11 +1,28 @@
 #include <SPI.h> // stokes auto-lib resolver for platformio
 #include <Adafruit_ILI9341.h>
-#include <Adafruit_STMPE610.h>
+// turns out my Adafruit doesn't have SPI touch screen breakout (looks like clone does thoough,
+// but we'll get there later)
+//#include <Adafruit_STMPE610.h>
+#include <TouchScreen.h>
+
+#include "variants.h"
 #include "gui.h"
 
+#ifdef ANALOG_TOUCHSCREEN
+#define YP A2  // must be an analog pin, use "An" notation!
+#define XM A3  // must be an analog pin, use "An" notation!
+#define YM 8   // can be a digital pin
+#define XP 9   // can be a digital pin
+
+// For better pressure precision, we need to know the resistance
+// between X+ and X- Use any multimeter to read it
+// For the one we're using, its 300 ohms across the X plate
+TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
+#else
 // The STMPE610 uses hardware SPI on the shield, and #8
 #define STMPE_CS 8
 Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
+#endif
 
 // The display also uses hardware SPI, plus #9 & #10
 #define TFT_CS 10
@@ -16,6 +33,14 @@ GUIService gui;
 
 void GUIService::begin()
 {
+#ifndef ADAFRUIT_ILI9341
+  // chinese clone version needs LCD explitly turned on, although
+  // we could probably tie the line high - WITH A RESISTOR - if I understand my
+  // electronics right
+  pinMode(7, OUTPUT);
+  digitalWrite(7, HIGH);
+#endif
+
   tft.begin();
 
   tft.fillScreen(ILI9341_BLACK);
@@ -24,10 +49,9 @@ void GUIService::begin()
   tft.setTextSize(1);
   tft.println("Hello World!");
 
+#ifndef ANALOG_TOUCHSCREEN
   if (!ts.begin()) {
     tft.println("Couldn't start touchscreen controller");
   }
-
-  pinMode(7, OUTPUT);
-  digitalWrite(7, HIGH);
+#endif
 }
