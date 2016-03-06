@@ -10,3 +10,6 @@
 [submodule "lib/Touch-Screen-Library"]
 	path = lib/Touch-Screen-Library
 	url = https://github.com/adafruit/Touch-Screen-Library.git
+[submodule "lib/ILI9341_t3"]
+	path = lib/ILI9341_t3
+	url = https://github.com/PaulStoffregen/ILI9341_t3.git

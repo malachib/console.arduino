@@ -1,5 +1,4 @@
 #include <SPI.h> // stokes auto-lib resolver for platformio
-#include <Adafruit_ILI9341.h>
 // turns out my Adafruit doesn't have SPI touch screen breakout (looks like clone does thoough,
 // but we'll get there later)
 //#include <Adafruit_STMPE610.h>
@@ -8,6 +7,12 @@
 #include "variants.h"
 #include "gui.h"
 #include "monitor.h"
+
+#ifdef T3_9341
+#include <ILI9341_t3.h>
+#else
+#include <Adafruit_ILI9341.h>
+#endif
 
 #ifdef ANALOG_TOUCHSCREEN
 #define YP A2  // must be an analog pin, use "An" notation!
@@ -28,7 +33,11 @@ Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
 // The display also uses hardware SPI, plus #9 & #10
 #define TFT_CS 10
 #define TFT_DC 9
+#ifdef T3_9341
+ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC);
+#else
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+#endif
 
 GUIService gui;
 
