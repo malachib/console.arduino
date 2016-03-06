@@ -8,3 +8,5 @@
 // NOTE not entirely sure these two aren't the same
 // #define XPT2046
 // #define STMPE610
+
+#define DEBUG
