@@ -7,6 +7,7 @@
 
 #include "variants.h"
 #include "gui.h"
+#include "monitor.h"
 
 #ifdef ANALOG_TOUCHSCREEN
 #define YP A2  // must be an analog pin, use "An" notation!
@@ -54,4 +55,13 @@ void GUIService::begin()
     tft.println("Couldn't start touchscreen controller");
   }
 #endif
+}
+
+void GUIService::stateHandler()
+{
+  while(monitor.stream->available())
+  {
+    int ch = monitor.stream->read();
+    tft.print((char)ch);
+  }
 }
