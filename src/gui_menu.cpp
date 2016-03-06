@@ -6,6 +6,8 @@
 #include "gui.h"
 #include "gfx_touch.h"
 
+#include <fact/lib.h>
+
 MenuService _menu;
 menuGFX gfx(tft);
 
@@ -27,17 +29,37 @@ public:
   void touch(_Vector3D<uint16_t> vector);
 };
 
+uint32_t bps;
 
-MENU(subMenu,"Sub-Menu",
+void setBPS(prompt& p)
+{
+#ifdef DEBUG
+  Serial << F("BPS set: ") << bps;
+#endif
+}
+
+/*
+MENU(subMenu2,"Sub-Menu",
   OP("Op1",nothing),
   OP("Op2",nothing),
   OP("Op3",nothing)
 );
+*/
+
+
+CHOOSE(bps, subMenuBPS,"BPS: ",
+  VALUE("2400",2400,setBPS),
+  VALUE("4800",4800,setBPS),
+  VALUE("9600",9600,setBPS),
+  VALUE("19200",19200,setBPS),
+  VALUE("57600",57600,setBPS),
+  VALUE("115200",115200,setBPS)
+);
 
 MENU(mainMenu,"Sistema",
   OP("A",nothing),
-  OP("B",nothing),
-  SUBMENU(subMenu)
+  //OP("B",nothing),
+  SUBMENU(subMenuBPS)
 );
 
 void MenuService::begin()
@@ -45,9 +67,11 @@ void MenuService::begin()
   gfx.resX*=2;//update resolution after font size change
   gfx.resY*=2;//update resolution after font size change
 
-  gfx.maxX=8;
-  gfx.maxY=3;
+  gfx.maxX=12;
+  gfx.maxY=4;
   gfx.bgColor=SILVER;
+
+  gfx.top = 2;
 }
 
 
