@@ -36,12 +36,18 @@ GUIService gui;
 
 #ifdef DEBUG
 #define ROW_HEIGHT 16
+#define COLUMN_WIDTH 12
 #else
 #define ROW_HEIGHT 8
+#define COLUMN_WIDTH 6
 #endif
-#define ROWS (320 / ROW_HEIGHT)
+#define SCREEN_HEIGHT 320
+#define SCREEN_WIDTH 240
 
-uint16_t iScrollStart = 8;
+#define ROWS (SCREEN_HEIGHT / ROW_HEIGHT)
+#define COLUMNS (SCREEN_WIDTH / COLUMN_WIDTH)
+
+uint16_t iScrollStart = 0;
 
 void SendVerticalScrollStartAddress(uint16_t wVSP);
 
@@ -71,6 +77,9 @@ void GUIService::begin()
   tft.println(F("Ready to listen"));
 #endif
 
+  // we're gonna handle this ourselves so that we can scroll properly
+  tft.setTextWrap(false);
+
 #ifndef ANALOG_TOUCHSCREEN
   if (!ts.begin()) {
     tft.println("Couldn't start touchscreen controller");
@@ -81,6 +90,11 @@ void GUIService::begin()
 // Using technique described here:
 // https://forums.adafruit.com/viewtopic.php?f=47&t=56039&sid=d490b4c0369e06d31d4d4f18727cb152
 void ScrollScreen(uint16_t px);
+
+void doCharScroll()
+{
+
+}
 
 void GUIService::stateHandler()
 {
@@ -94,8 +108,10 @@ void GUIService::stateHandler()
       uint8_t cursor_y = (tft.getCursorY() / ROW_HEIGHT); // we'll operate in rows, not pixels
 
 #ifdef DEBUG
-      Serial << F("cursor_y = ") << cursor_y;
       Serial << F("scrollMode = ") << scrollMode;
+      Serial << F(" cursor_y = ") << cursor_y;
+      Serial << F(" cursor_y [actual] = ") << tft.getCursorY();
+      Serial << F(" scrollStart = ") << iScrollStart;
       Serial.println();
 #endif
 
@@ -105,21 +121,30 @@ void GUIService::stateHandler()
         cursor_y = 0;
         scrollMode = true;
       }
+      else
+      {
+        tft.println();
+        cursor_y++;
+      }
 
       if(scrollMode)
       {
-        ScrollScreen(ROW_HEIGHT);
         // hardware scroll moves the actual screen origin around,
         // so we have to move the fillrect here to keep it stationary (on the bottom)
         // on the actual screen
         //tft.fillRect(0, 319 - ROW_HEIGHT, 239, 319, 0xFFFF);
-        tft.fillRect(0, cursor_y * ROW_HEIGHT, 240, ROW_HEIGHT, 0);
-      }
 
-      tft.println();
+        // erase next line
+        tft.fillRect(0, cursor_y * ROW_HEIGHT, SCREEN_WIDTH, ROW_HEIGHT, 0);
+        ScrollScreen(ROW_HEIGHT);
+      }
     }
     else
+    {
+      // TODO: next up is word wrap handling
       tft.print((char)ch);
+      uint8_t cursor_x = (tft.getCursorX() / COLUMN_WIDTH);
+    }
   }
 }
 
@@ -127,7 +152,7 @@ void GUIService::stateHandler()
 void ScrollScreen(uint16_t px) {
   // Try simple...
   iScrollStart += px;
-  if (iScrollStart == 320)
+  if (iScrollStart == SCREEN_HEIGHT)
     iScrollStart = px;
   SendVerticalScrollStartAddress(iScrollStart);
 }
