@@ -24,5 +24,14 @@ public:
   static void stateHandler();
 };
 
+
+class TouchService
+{
+public:
+  static void begin();
+  static void stateHandler();
+};
+
 extern GUIService gui;
+extern TouchService touch;
 extern Adafruit_ILI9341 tft;

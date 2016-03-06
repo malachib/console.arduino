@@ -7,12 +7,31 @@ struct _Vector
 {
   TPrecision  x;
   TPrecision  y;
+
+  template <class TIn>
+  _Vector(TIn tin)
+  {
+    x = tin.x;
+    y = tin.y;
+  }
+
+  _Vector() {}
 };
 
 template <class TPrecision>
-struct _Vector3D : _Vector<TPrecision>
+struct _Vector3D : public _Vector<TPrecision>
 {
   TPrecision z;
+
+  template <class TIn>
+  _Vector3D(TIn tin) : _Vector<TPrecision>(tin)
+  {
+    //x = tin.x;
+    //y = tin.y;
+    z = tin.z;
+  }
+
+  _Vector3D() {}
 };
 
 template <class TPrecision>

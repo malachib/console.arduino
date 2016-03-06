@@ -4,26 +4,7 @@
 #include "monitor.h"
 #include <fact/lib.h>
 
-// turns out my Adafruit doesn't have SPI touch screen breakout (looks like clone does thoough,
-// but we'll get there later)
-//#include <Adafruit_STMPE610.h>
-#include <TouchScreen.h>
 
-#ifdef ANALOG_TOUCHSCREEN
-#define YP A2  // must be an analog pin, use "An" notation!
-#define XM A3  // must be an analog pin, use "An" notation!
-#define YM 8   // can be a digital pin
-#define XP 9   // can be a digital pin
-
-// For better pressure precision, we need to know the resistance
-// between X+ and X- Use any multimeter to read it
-// For the one we're using, its 300 ohms across the X plate
-TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
-#else
-// The STMPE610 uses hardware SPI on the shield, and #8
-#define STMPE_CS 8
-Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
-#endif
 
 // The display also uses hardware SPI, plus #9 & #10
 #define TFT_CS 10
@@ -127,6 +108,8 @@ void doCharScroll()
     ScrollScreen(ROW_HEIGHT);
   }
 }
+
+void touch_test();
 
 void GUIService::stateHandler()
 {
