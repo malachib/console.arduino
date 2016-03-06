@@ -59,26 +59,41 @@ void TouchService::begin(RegionResponder* regionResponder)
 
 void TouchService::stateHandler()
 {
-  TSPoint p = ts.getPoint();
+  Vector3D p = getPoint();
 
   // we have some minimum pressure we consider 'valid'
   // pressure of 0 means no pressing!
   if (p.z > ts.pressureThreshhold)
   {
     isPressed = true;
+    // this is a "release" (aka mouseup) event
+    Region* r = regionResponder->find(p);
+    if(r != lastPressed)
+    {
+      // TODO: once we get an extra parameter for the event system,
+      // this will go more smoothly
+      lastPressed = r;
+      pressed(this);
+    }
+    else
+      lastPressed = r;
   }
   else
   {
     if(isPressed)
     {
       // this is a "release" (aka mouseup) event
-      Region* r = regionResponder->find(p);
-
+      //Region* r = regionResponder->find(p);
+      auto r = lastPressed;
       if(r != NULL)
       {
-        lastPressed = r;
+        // last pressed will already be populated from press
+        // *theoretically* it's impossible to have a release
+        // on a different position than a press....
+        //lastPressed = r;
         released(this);
       }
+      isPressed = false;
     }
   }
 }
