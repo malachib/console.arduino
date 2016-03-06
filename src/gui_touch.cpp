@@ -1,3 +1,5 @@
+// this is app inspecific code area, eventually to end up in a library
+
 #include "gui.h"
 #include "gfx_touch.h"
 
@@ -23,7 +25,7 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
 Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
 #endif
 
-TouchService touch;
+AnalogTouchService touch;
 
 void TouchActionResponder::touch(_Vector3D<uint16_t> vector)
 {
@@ -47,11 +49,11 @@ void touch_test()
 }
 
 
-bool isPressed = true;
+bool isPressed = false;
 
-void TouchService::begin()
+void TouchService::begin(RegionResponder* regionResponder)
 {
-
+  this->regionResponder = regionResponder;
 }
 
 
@@ -63,6 +65,26 @@ void TouchService::stateHandler()
   // pressure of 0 means no pressing!
   if (p.z > ts.pressureThreshhold)
   {
-    isPressed;
+    isPressed = true;
   }
+  else
+  {
+    if(isPressed)
+    {
+      // this is a "release" (aka mouseup) event
+      Region* r = regionResponder->find(p);
+
+      if(r != NULL)
+      {
+        lastPressed = r;
+        released(this);
+      }
+    }
+  }
+}
+
+
+Vector3D AnalogTouchService::getPoint()
+{
+  return ts.getPoint();
 }

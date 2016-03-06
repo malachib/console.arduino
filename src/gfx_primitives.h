@@ -34,6 +34,14 @@ struct _Vector3D : public _Vector<TPrecision>
   _Vector3D() {}
 };
 
+
+struct Vector3D : _Vector3D<uint16_t>
+{
+  template <class TIn>
+  Vector3D(TIn tin) : _Vector3D<uint16_t>(tin)
+  { }
+};
+
 template <class TPrecision>
 struct _Rectangle
 {

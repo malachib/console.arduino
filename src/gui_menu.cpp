@@ -11,15 +11,6 @@ menuGFX gfx(tft);
 void nothing() {}
 
 
-Region regionUp(1, 0,0,240,30);
-Region regionDown(2, 0,290,240,30);
-Region regionEnter(0, 0,31,240,320 - 60);
-//ActionRegion regionBackup(3,)
-Region *actionRegions[] =
-{ &regionUp, &regionDown, &regionEnter };
-
-RegionResponder regionResponder(actionRegions);
-
 // gather touch events as a stream, since this is
 // how neu-rah's menu handler likes it
 class TouchMenuStream : public Stream

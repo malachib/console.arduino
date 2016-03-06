@@ -1,3 +1,7 @@
+#pragma once
+
+#include "gfx_primitives.h"
+
 // reports whether a given point occurs within a set of regions
 class RegionResponder
 {
@@ -24,6 +28,11 @@ public:
     }
 
     return NULL;
+  }
+
+  Region* find(_Vector<uint16_t> vector)
+  {
+    return find(vector.x, vector.y);
   }
 };
 
