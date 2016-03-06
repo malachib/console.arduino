@@ -5,6 +5,8 @@
 #include <Adafruit_ILI9341.h>
 #include <Service.h>
 
+#include "gfx_primitives.h"
+
 class GUIService
 {
 public:
