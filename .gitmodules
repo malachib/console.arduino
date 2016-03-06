@@ -13,3 +13,6 @@
 [submodule "lib/ArduinoMenu"]
 	path = lib/ArduinoMenu
 	url = https://github.com/neu-rah/ArduinoMenu.git
+[submodule "lib/Adafruit_SleepyDog"]
+	path = lib/Adafruit_SleepyDog
+	url = git@github.com:malachib/Adafruit_SleepyDog.git
