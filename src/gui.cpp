@@ -1,11 +1,9 @@
 #include <SPI.h> // stokes auto-lib resolver for platformio
 
-#include "variants.h"
 #include "gui.h"
 #include "monitor.h"
 #include <fact/lib.h>
 
-#include <Adafruit_ILI9341.h>
 // turns out my Adafruit doesn't have SPI touch screen breakout (looks like clone does thoough,
 // but we'll get there later)
 //#include <Adafruit_STMPE610.h>
@@ -145,7 +143,7 @@ void GUIService::stateHandler()
       uint8_t cursor_x = (tft.getCursorX() / COLUMN_WIDTH);
       if(cursor_x == COLUMNS)
         doCharScroll();
-        
+
       tft.print((char)ch);
     }
   }

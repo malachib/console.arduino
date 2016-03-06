@@ -10,3 +10,6 @@
 [submodule "lib/Touch-Screen-Library"]
 	path = lib/Touch-Screen-Library
 	url = https://github.com/adafruit/Touch-Screen-Library.git
+[submodule "lib/ArduinoMenu"]
+	path = lib/ArduinoMenu
+	url = https://github.com/neu-rah/ArduinoMenu.git
