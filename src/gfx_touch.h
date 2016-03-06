@@ -6,9 +6,11 @@
 class RegionResponder
 {
   Region** regions;
+  uint8_t regionCount;
 
 public:
-  RegionResponder(Region** regions) : regions(regions)
+  RegionResponder(Region** regions, uint8_t regionCount) :
+    regions(regions), regionCount(regionCount)
   {
 
   }
@@ -17,7 +19,7 @@ public:
   {
     Region** region = regions;
 
-    for(int i = 3; i-- > 0;)
+    for(int i = regionCount; i-- > 0;)
     {
       auto r = *region;
       if(x >= r->getX() && x <= r->getBoundX() &&

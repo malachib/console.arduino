@@ -53,6 +53,9 @@ bool isPressed = false;
 
 void TouchService::begin(RegionResponder* regionResponder)
 {
+  released.clear();
+  pressed.clear();
+
   this->regionResponder = regionResponder;
 }
 
@@ -75,8 +78,6 @@ void TouchService::stateHandler()
       lastPressed = r;
       pressed(this);
     }
-    else
-      lastPressed = r;
   }
   else
   {

@@ -6,6 +6,7 @@
 #include "gui.h"
 #include "gfx_touch.h"
 
+MenuService _menu;
 menuGFX gfx(tft);
 
 void nothing() {}
@@ -41,11 +42,16 @@ MENU(mainMenu,"Sistema",
 
 void MenuService::begin()
 {
+  gfx.resX*=2;//update resolution after font size change
+  gfx.resY*=2;//update resolution after font size change
 
+  gfx.maxX=8;
+  gfx.maxY=3;
+  gfx.bgColor=SILVER;
 }
 
 
 void MenuService::stateHandler()
 {
-  //mainMenu.poll(gfx);
+  mainMenu.poll(gfx, Serial);
 }

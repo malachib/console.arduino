@@ -31,20 +31,20 @@ class TouchService
 {
   RegionResponder* regionResponder;
 
-  // TODO: improve event handler to actually pass in a parameter vs. just the sender
-  Region* lastPressed;
-
   LOCAL_EVENT(TouchService);
   //DECLARE_EVENT(Region) pressed;
   //DECLARE_EVENT(Region) released;
-  Event pressed;
-  Event released;
-
 protected:
   virtual Vector3D getPoint() = 0;
 public:
+  Event pressed;
+  Event released;
+
   void begin(RegionResponder* regionResponder);
   void stateHandler();
+
+  // TODO: improve event handler to actually pass in a parameter vs. just the sender
+  Region* lastPressed;
 };
 
 class AnalogTouchService : public TouchService
@@ -56,3 +56,4 @@ protected:
 extern GUIService gui;
 extern AnalogTouchService touch;
 extern Adafruit_ILI9341 tft;
+extern MenuService _menu;
