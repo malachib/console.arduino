@@ -155,7 +155,8 @@ void TouchService::stateHandler()
 }
 
 
-bool TouchService::calibrated = false;
+bool TouchCalibration::calibrated = false;
+Rectangle TouchCalibration::screenBounds;
 
 Vector3D AnalogTouchService::getPoint()
 {

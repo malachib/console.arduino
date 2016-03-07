@@ -36,7 +36,8 @@ public:
 class TouchCalibration
 {
 public:
-  Rectangle screenBounds;
+  static Rectangle screenBounds;
+  static bool calibrated;
 
   TouchCalibration() {}
 };
@@ -67,8 +68,6 @@ public:
   // TODO: improve event handler to actually pass in a parameter vs. just the sender
   Region* lastPressed;
   Vector3D lastPoint;
-
-  static bool calibrated;
 };
 
 class AnalogTouchService : public TouchService
