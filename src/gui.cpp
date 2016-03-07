@@ -117,6 +117,10 @@ void GUIService::stateHandler()
 {
   switch(state)
   {
+    case Initializing:
+      state = Calibration;
+      break;
+
     case Active:
       stateHandlerMonitor();
       break;
@@ -147,6 +151,10 @@ static union
 
 };
 
+#define CAL_EDGE_OFFSET 10
+#define CAL_CIRCLE_RADIUS 30
+
+
 
 Vector upperLeft;
 Vector lowerRight;
@@ -157,10 +165,27 @@ void calibrationTouchResponder(TouchService* touch)
   {
     case UpperLeft:
       upperLeft = touch->lastPoint;
+      calibrationState = LowerRight;
+#ifdef DEBUG
+      Serial << F("UpperLeft Calibration");
+      Serial.println();
+#endif
+      tft.fillScreen(ILI9341_BLACK);
+      tft.drawCircle(SCREEN_WIDTH - CAL_EDGE_OFFSET,SCREEN_HEIGHT - CAL_EDGE_OFFSET,CAL_CIRCLE_RADIUS,0xFFFF);
+
       break;
 
     case LowerRight:
+#ifdef DEBUG
+      Serial << F("LowerLeft Calibration");
+      Serial.println();
+#endif
       lowerRight = touch->lastPoint;
+      calibrationState = Calibrated;
+#ifdef DEBUG
+      Serial << F("LowerLeft Calibration II");
+      Serial.println();
+#endif
       break;
   }
 }
@@ -170,8 +195,14 @@ void GUIService::stateHandlerCalibration()
   switch(calibrationState)
   {
     case Initialize:
+#ifdef DEBUG
+      Serial << F("Initialize Calibration");
+      Serial.println();
+#endif
       touch.released.clear();
       touch.released += calibrationTouchResponder;
+      tft.drawCircle(CAL_EDGE_OFFSET,CAL_EDGE_OFFSET,CAL_CIRCLE_RADIUS,0xFFFF);
+      calibrationState = UpperLeft;
       break;
 
     case UpperLeft:
@@ -184,6 +215,10 @@ void GUIService::stateHandlerCalibration()
       break;
 
     case Calibrated:
+#ifdef DEBUG
+      Serial << F("Initialize Calibration");
+      Serial.println();
+#endif
       state = Active;
       break;
   }
@@ -210,9 +245,6 @@ void GUIService::stateHandlerMonitor()
   }
 }
 
-
-#define CAL_EDGE_OFFSET 10
-#define CAL_CIRCLE_RADIUS 30
 
 void GUIService::displayTouchCalibration()
 {
