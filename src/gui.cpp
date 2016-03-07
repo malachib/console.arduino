@@ -196,15 +196,12 @@ void GUIService::stateHandler()
 
 
 
-Vector TouchService::upperLeft;
-Vector TouchService::lowerRight;
-
-void calibrationTouchResponder(TouchService* touch)
+void calibrationTouchResponder(TouchService* _touch)
 {
   switch(calibrationState)
   {
     case calibration::UpperLeft:
-      TouchService::upperLeft = touch->lastPoint;
+      touch.screenBounds.origin = _touch->lastPoint;
       calibrationState = calibration::LowerRight;
 #ifdef DEBUG
       Serial << F("UpperLeft Calibration");
@@ -216,11 +213,14 @@ void calibrationTouchResponder(TouchService* touch)
       break;
 
     case calibration::LowerRight:
-#ifdef DEBUG
-      Serial << F("LowerRight Calibration");
+      touch.screenBounds.size = _touch->lastPoint - touch.screenBounds.origin;
+
+#ifdef DEBUG2
+      Serial << F("LowerRight Calibration: size (adj) = ") <<
+        touchCalibration.screenBounds.size;
       Serial.println();
 #endif
-      TouchService::lowerRight = touch->lastPoint;
+
       calibrationState = calibration::Calibrated;
 #ifdef DEBUG2
       Serial << F("LowerLeft Calibration II");
@@ -256,7 +256,8 @@ void GUIService::stateHandlerCalibration()
 
     case calibration::Calibrated:
 #ifdef DEBUG
-      Serial << F("Calibrated UL=") << touch.upperLeft << " and LR=" << touch.lowerRight;
+      Serial << F("Calibrated OR=") << touch.screenBounds.origin;
+      Serial << F(" and SZ=") << touch.screenBounds.size;
       Serial.println();
 #endif
       touch.calibrated = true;

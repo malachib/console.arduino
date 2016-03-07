@@ -56,7 +56,7 @@ void TouchService::stateHandler()
   {
     if(calibrated)
     {
-  #ifdef DEBUG2
+  #ifdef DEBUG
       static uint8_t thinner = 0;
 
       if(thinner++ % 100 == 0)
@@ -65,11 +65,16 @@ void TouchService::stateHandler()
         Serial.println();
       }
   #endif
-      auto width = lowerRight.x - upperLeft.x;
-      auto height = lowerRight.y - upperLeft.y;
+      auto width = screenBounds.size.x;
+      auto height = screenBounds.size.y;
 
-      p.x -= upperLeft.x;
-      p.y -= upperLeft.y;
+      //p -= screenBounds.origin;
+
+      p.x -= screenBounds.origin.x;
+      p.y -= screenBounds.origin.y;
+
+      //p.x -= upperLeft.x;
+      //p.y -= upperLeft.y;
 
       // FIX: temporarily hardcode screen dimensions here
       p.x = ((uint32_t)p.x) * 240 / width;
@@ -83,7 +88,7 @@ void TouchService::stateHandler()
     // that release events don't give solid X/Y coordinates
     lastPoint = p;
 
-#ifdef DEBUG2
+#ifdef DEBUG
     static uint8_t thinner = 0;
 
     if(thinner++ % 100 == 0)

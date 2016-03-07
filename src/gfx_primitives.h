@@ -16,6 +16,24 @@ struct _Vector
   }
 
   _Vector() {}
+
+  template <class T>
+  _Vector<TPrecision>& operator-=(T& in)
+  {
+    x -= in.x;
+    y -= in.y;
+    return *this;
+  }
+
+  template <class T1, class T2>
+  friend _Vector<TPrecision> operator-(T1& v1, T2& v2)
+  {
+    _Vector<TPrecision> out(v1);
+
+    out -= v2;
+
+    return out;
+  }
 };
 
 template <class TPrecision>
@@ -26,12 +44,29 @@ struct _Vector3D : public _Vector<TPrecision>
   template <class TIn>
   _Vector3D(TIn tin) : _Vector<TPrecision>(tin)
   {
-    //x = tin.x;
-    //y = tin.y;
     z = tin.z;
   }
 
   _Vector3D() {}
+
+
+  _Vector3D<TPrecision>& operator-=(_Vector<TPrecision>& in)
+  {
+    _Vector<TPrecision>::x -= in.x;
+    _Vector<TPrecision>::y -= in.y;
+
+    return *this;
+  }
+
+  template <class T>
+  _Vector3D<TPrecision>& operator-=(T& in)
+  {
+    _Vector<TPrecision>::x -= in.x;
+    _Vector<TPrecision>::y -= in.y;
+    z -= in.z;
+
+    return *this;
+  }
 };
 
 
@@ -42,6 +77,29 @@ struct Vector : public _Vector<uint16_t>
   { }
 
   Vector() {}
+
+  //Vector(_Vector<uint16_t>& in)
+
+  /*
+  friend Vector operator-(_Vector<uint16_t>& v1, _Vector<uint16_t>& v2)
+  {
+    Vector out;
+
+    out.x = v1.x - v2.x;
+    out.y = v1.y - v2.y;
+
+    return out;
+  } */
+
+  Vector operator - (_Vector<uint16_t>& in)
+  {
+    Vector out;
+
+    out.x = x - in.x;
+    out.y = y - out.y;
+
+    return out;
+  }
 };
 
 
@@ -97,13 +155,17 @@ inline Print& operator <<(Print& obj, Vector3D& v)
 template <class TPrecision>
 struct _Rectangle
 {
-protected:
+//protected:
   // where within drawing area this rectangle begins
   _Vector<TPrecision>  origin;
   // horizontal and vertical size of rectangle
   _Vector<TPrecision>  size;
 
-public:
+//public:
+  _Rectangle() {}
+  _Rectangle(_Vector<TPrecision>& origin, _Vector<TPrecision>& size) :
+    origin(origin), size(size) {}
+
   TPrecision getX() { return origin.x; }
   TPrecision getY() { return origin.y; }
   TPrecision getWidth() { return size.x; }
@@ -121,6 +183,11 @@ struct Rectangle : public _Rectangle<uint16_t>
     size.x = width;
     size.y = height;
   }
+
+  Rectangle(Vector& origin, Vector& size) : _Rectangle<uint16_t>(origin, size)
+  {}
+
+  Rectangle() {}
 };
 
 struct Region : public Rectangle

@@ -35,10 +35,13 @@ public:
 
 class TouchCalibration
 {
+public:
+  Rectangle screenBounds;
 
+  TouchCalibration() {}
 };
 
-class TouchService
+class TouchService : public TouchCalibration
 {
   RegionResponder* regionResponder;
 
@@ -65,9 +68,6 @@ public:
   Region* lastPressed;
   Vector3D lastPoint;
 
-  // calibration
-  static Vector upperLeft;
-  static Vector lowerRight;
   static bool calibrated;
 };
 
