@@ -70,6 +70,31 @@ void TouchService::stateHandler()
   // pressure of 0 means no pressing!
   if (p.z > ts.pressureThreshhold)
   {
+    if(calibrated)
+    {
+  #ifdef DEBUG
+      static uint8_t thinner = 0;
+
+      if(thinner++ % 100 == 0)
+      {
+        Serial << F("Precalibrated: ") << p;
+        Serial.println();
+      }
+  #endif
+      auto width = lowerRight.x - upperLeft.x;
+      auto height = lowerRight.y - upperLeft.y;
+
+      p.x -= upperLeft.x;
+      p.y -= upperLeft.y;
+
+      // FIX: temporarily hardcode screen dimensions here
+      p.x = ((uint32_t)p.x) * 240 / width;
+      p.y = ((uint32_t)p.y) * 320 / height;
+
+      // TODO: calibration is far from perfect.  We get out of bounds a lot (negative x, etc)
+      // so compensate for that.  However for short term, we're OK with that
+    }
+
     // only record points for actual press, it seems (and makes sense)
     // that release events don't give solid X/Y coordinates
     lastPoint = p;
@@ -79,7 +104,7 @@ void TouchService::stateHandler()
 
     if(thinner++ % 100 == 0)
     {
-      Serial << F("Touch found at: ") << p.x << ',' << p.y << ',' << p.z;
+      Serial << F("Touch found at: ") << p;
       Serial.println();
     }
 #endif
@@ -121,8 +146,12 @@ void TouchService::stateHandler()
         // *theoretically* it's impossible to have a release
         // on a different position than a press....
         //lastPressed = r;
-        released(this);
 #ifdef DEBUG
+        Serial << F("Touch released at: ") << lastPoint;
+        Serial.println();
+#endif
+        released(this);
+#ifdef DEBUG2
         Serial << F("Touch released at: ") << p.x << ',' << p.y << ',' << p.z;
         Serial.println();
 #endif
@@ -135,6 +164,8 @@ void TouchService::stateHandler()
   }
 }
 
+
+bool TouchService::calibrated = false;
 
 Vector3D AnalogTouchService::getPoint()
 {

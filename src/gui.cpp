@@ -46,6 +46,15 @@ void GUIService::begin()
 
   SendVerticalScrollStartAddress(0);
 
+#ifndef ANALOG_TOUCHSCREEN
+  if (!ts.begin()) {
+    tft.println("Couldn't start touchscreen controller");
+  }
+#endif
+}
+
+void GUIService::initializeActive()
+{
   tft.fillScreen(ILI9341_BLACK);
   tft.setCursor(0, 0);
   tft.setTextColor(ILI9341_WHITE);
@@ -60,12 +69,6 @@ void GUIService::begin()
 
   // we're gonna handle this ourselves so that we can scroll properly
   tft.setTextWrap(false);
-
-#ifndef ANALOG_TOUCHSCREEN
-  if (!ts.begin()) {
-    tft.println("Couldn't start touchscreen controller");
-  }
-#endif
 }
 
 // Using technique described here:
@@ -113,6 +116,39 @@ void doCharScroll()
 
 void touch_test();
 
+namespace calibration
+{
+  // TODO: try to get union to live more happily within state class.
+  // anonymous static union made it unhappy
+  enum CalibrationState
+  {
+    // we begin with a 2 second countdown to recalibrate screen if desired,
+    // if screen is not touched then we proceed straight into monitor mode
+    Initialize,
+    UpperLeft,
+    Middle,
+    LowerRight,
+    Calibrated
+  };
+}
+
+namespace active
+{
+  enum ActiveState
+  {
+    Initialize, // yuck
+    Monitoring
+  };
+}
+
+
+static union
+{
+  calibration::CalibrationState calibrationState;
+  active::ActiveState activeState;
+};
+
+
 void GUIService::stateHandler()
 {
   switch(state)
@@ -122,7 +158,17 @@ void GUIService::stateHandler()
       break;
 
     case Active:
-      stateHandlerMonitor();
+      switch(activeState)
+      {
+        case active::Initialize:
+          initializeActive();
+          activeState = active::Monitoring;
+          break;
+
+        case active::Monitoring:
+          stateHandlerMonitor();
+          break;
+      }
       break;
 
     case Calibration:
@@ -131,41 +177,21 @@ void GUIService::stateHandler()
   }
 }
 
-// TODO: try to get union to live more happily within state class.
-// anonymous static union made it unhappy
-enum CalibrationState
-{
-  // we begin with a 2 second countdown to recalibrate screen if desired,
-  // if screen is not touched then we proceed straight into monitor mode
-  Initialize,
-  UpperLeft,
-  Middle,
-  LowerRight,
-  Calibrated
-};
-
-
-static union
-{
-  CalibrationState calibrationState;
-
-};
-
 #define CAL_EDGE_OFFSET 10
 #define CAL_CIRCLE_RADIUS 30
 
 
 
-Vector upperLeft;
-Vector lowerRight;
+Vector TouchService::upperLeft;
+Vector TouchService::lowerRight;
 
 void calibrationTouchResponder(TouchService* touch)
 {
   switch(calibrationState)
   {
-    case UpperLeft:
-      upperLeft = touch->lastPoint;
-      calibrationState = LowerRight;
+    case calibration::UpperLeft:
+      TouchService::upperLeft = touch->lastPoint;
+      calibrationState = calibration::LowerRight;
 #ifdef DEBUG
       Serial << F("UpperLeft Calibration");
       Serial.println();
@@ -175,13 +201,13 @@ void calibrationTouchResponder(TouchService* touch)
 
       break;
 
-    case LowerRight:
+    case calibration::LowerRight:
 #ifdef DEBUG
       Serial << F("LowerRight Calibration");
       Serial.println();
 #endif
-      lowerRight = touch->lastPoint;
-      calibrationState = Calibrated;
+      TouchService::lowerRight = touch->lastPoint;
+      calibrationState = calibration::Calibrated;
 #ifdef DEBUG2
       Serial << F("LowerLeft Calibration II");
       Serial.println();
@@ -194,7 +220,7 @@ void GUIService::stateHandlerCalibration()
 {
   switch(calibrationState)
   {
-    case Initialize:
+    case calibration::Initialize:
 #ifdef DEBUG
       Serial << F("Initialize Calibration");
       Serial.println();
@@ -202,24 +228,27 @@ void GUIService::stateHandlerCalibration()
       touch.released.clear();
       touch.released += calibrationTouchResponder;
       tft.drawCircle(CAL_EDGE_OFFSET,CAL_EDGE_OFFSET,CAL_CIRCLE_RADIUS,0xFFFF);
-      calibrationState = UpperLeft;
+      calibrationState = calibration::UpperLeft;
       break;
 
-    case UpperLeft:
+    case calibration::UpperLeft:
       break;
 
-    case Middle:
+    case calibration::Middle:
       break;
 
-    case LowerRight:
+    case calibration::LowerRight:
       break;
 
-    case Calibrated:
+    case calibration::Calibrated:
 #ifdef DEBUG
-      Serial << F("Calibrated UL=") << upperLeft << " and LR=" << lowerRight;
+      Serial << F("Calibrated UL=") << touch.upperLeft << " and LR=" << touch.lowerRight;
       Serial.println();
 #endif
+      touch.calibrated = true;
+      touch.released.clear();
       state = Active;
+      activeState = active::Initialize;
       break;
   }
 }
@@ -243,14 +272,6 @@ void GUIService::stateHandlerMonitor()
       tft.print((char)ch);
     }
   }
-}
-
-
-void GUIService::displayTouchCalibration()
-{
-  tft.drawCircle(CAL_EDGE_OFFSET,CAL_EDGE_OFFSET,CAL_CIRCLE_RADIUS,0xFFFF);
-  tft.drawCircle(SCREEN_WIDTH - CAL_EDGE_OFFSET,SCREEN_HEIGHT - CAL_EDGE_OFFSET,CAL_CIRCLE_RADIUS,0xFFFF);
-  tft.drawCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, CAL_CIRCLE_RADIUS, 0xFFFF);
 }
 
 

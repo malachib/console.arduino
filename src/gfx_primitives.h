@@ -35,7 +35,7 @@ struct _Vector3D : public _Vector<TPrecision>
 };
 
 
-struct Vector : _Vector<uint16_t>
+struct Vector : public _Vector<uint16_t>
 {
   template <class TIn>
   Vector(TIn tin) : _Vector<uint16_t>(tin)
@@ -55,6 +55,14 @@ inline Print& operator <<(Print& obj, _Vector<T>& v)
   return obj;
 }
 
+/*
+inline Print& operator <<(Print& obj, _Vector<uint16_t>& v)
+{
+  obj.print(v.x);
+  obj.print(',');
+  obj.print(v.y);
+  return obj;
+}*/
 
 //template<class T>
 inline Print& operator <<(Print& obj, Vector& v)
@@ -65,11 +73,7 @@ inline Print& operator <<(Print& obj, Vector& v)
   return obj;
 }
 
-
-
-
-
-struct Vector3D : _Vector3D<uint16_t>
+struct Vector3D : public _Vector3D<uint16_t>
 {
   template <class TIn>
   Vector3D(TIn tin) : _Vector3D<uint16_t>(tin)
@@ -77,6 +81,18 @@ struct Vector3D : _Vector3D<uint16_t>
 
   Vector3D() {}
 };
+
+
+inline Print& operator <<(Print& obj, Vector3D& v)
+{
+  obj.print(v.x);
+  obj.print(',');
+  obj.print(v.y);
+  return obj;
+}
+
+
+
 
 template <class TPrecision>
 struct _Rectangle

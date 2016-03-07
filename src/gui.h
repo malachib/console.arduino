@@ -26,7 +26,7 @@ public:
   static void stateHandler();
   static void stateHandlerMonitor();
   static void stateHandlerCalibration();
-  static void displayTouchCalibration();
+  static void initializeActive();
 
   static State state;
 
@@ -60,6 +60,11 @@ public:
   // TODO: improve event handler to actually pass in a parameter vs. just the sender
   Region* lastPressed;
   Vector3D lastPoint;
+
+  // calibration
+  static Vector upperLeft;
+  static Vector lowerRight;
+  static bool calibrated;
 };
 
 class AnalogTouchService : public TouchService
