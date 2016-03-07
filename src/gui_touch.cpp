@@ -30,23 +30,7 @@ AnalogTouchService touch;
 
 void TouchActionResponder::touch(_Vector3D<uint16_t> vector)
 {
-  Region* region = regionResponder.find(vector.x, vector.y);
-}
-
-void touch_test2(_Vector3D<uint16_t> vector)
-{
-  //Serial << F("TEST");
-  //Serial.println();
-  vector.x++;
-}
-
-void touch_test()
-{
-  TSPoint point;
-  _Vector3D<uint16_t> p2 = point;
-  touch_test2(point);
-  //_Vector<uint32_t> p1 = point;
-  //_Vector3D<uint16_t> p3 = p1;
+  Region* region = regionResponder.find(vector);
 }
 
 
@@ -72,7 +56,7 @@ void TouchService::stateHandler()
   {
     if(calibrated)
     {
-  #ifdef DEBUG
+  #ifdef DEBUG2
       static uint8_t thinner = 0;
 
       if(thinner++ % 100 == 0)
@@ -99,7 +83,7 @@ void TouchService::stateHandler()
     // that release events don't give solid X/Y coordinates
     lastPoint = p;
 
-#ifdef DEBUG
+#ifdef DEBUG2
     static uint8_t thinner = 0;
 
     if(thinner++ % 100 == 0)
@@ -111,9 +95,10 @@ void TouchService::stateHandler()
 
     isPressed = true;
     lastPressedTime = millis();
-    // this is a "release" (aka mouseup) event
+    // this is a "press" (aka mousedown) event
     if(regionResponder)
     {
+      // only re-press if we move to a different region from before
       Region* r = regionResponder->find(p);
       if(r != lastPressed)
       {

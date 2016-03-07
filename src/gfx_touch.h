@@ -27,6 +27,8 @@ public:
       {
         return r;
       }
+
+      region++;
     }
 
     return NULL;

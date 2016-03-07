@@ -2,6 +2,7 @@
 #include <menuGFX.h>
 #include <chainStream.h>// concatenate multiple input streams (this allows adding a button to the encoder)
 #include <menuFields.h>
+#include <genericKeyboard.h>
 
 #include "gui.h"
 #include "gfx_touch.h"
@@ -13,7 +14,7 @@ menuGFX gfx(tft);
 
 void nothing() {}
 
-
+//TouchActionResponder
 // gather touch events as a stream, since this is
 // how neu-rah's menu handler likes it
 class TouchMenuStream : public Stream
@@ -26,8 +27,14 @@ public:
   }
 
   // only call this when touch threshold has been reached, determined externally
-  void touch(_Vector3D<uint16_t> vector);
+  void touch(Vector vector);
 };
+
+
+void TouchMenuStream::touch(Vector vector)
+{
+  //touchResponder
+}
 
 uint32_t bps;
 
@@ -74,8 +81,42 @@ void MenuService::begin()
   gfx.top = 2;
 }
 
+int menuCommand;
+
+void MenuService::touchReleasedHandler(TouchService *ts)
+{
+  Region* region = ts->lastPressed;
+  uint8_t regionCode = region->regionCode;
+
+  switch(regionCode)
+  {
+    // FIX: somehow my up/down codes are getting reversed
+    // up
+    case 2:
+      menuCommand = menu::upCode;
+      break;
+    // down
+    case 1:
+      menuCommand = menu::downCode;
+      break;
+    // enter
+    case 0:
+      menuCommand = menu::enterCode;
+      break;
+  }
+}
+
+int getMenuCommand()
+{
+  int temp = menuCommand;
+  menuCommand = -1;
+  return temp;
+}
+
+genericKeyboard forcedKeyIn(getMenuCommand);
+
 
 void MenuService::stateHandler()
 {
-  mainMenu.poll(gfx, Serial);
+  mainMenu.poll(gfx, forcedKeyIn);
 }

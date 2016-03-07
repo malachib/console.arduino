@@ -63,9 +63,9 @@ void GUIService::begin()
 #endif
 }
 
-Region regionUp(1, 0,0,240,30);
-Region regionDown(2, 0,290,240,30);
-Region regionEnter(0, 0,31,240,320 - 60);
+Region regionUp(1, 0,0,240,60);
+Region regionDown(2, 0,260,240,60);
+Region regionEnter(0, 0,31,240,320 - 120);
 
 Region *actionRegions[] =
 { &regionUp, &regionDown, &regionEnter };
@@ -80,8 +80,7 @@ void menuResponder(TouchService* ts)
   Serial.println();
 #endif
 
-  _menu.begin();
-  activeState = active::Menu;
+  activeState = active::MenuInitialize;
 }
 
 
@@ -162,11 +161,22 @@ void GUIService::stateHandler()
       {
         case active::Initialize:
           initializeActive();
+          activeState = active::MonitoringInitialize;
+          break;
+
+        case active::MonitoringInitialize:
           activeState = active::Monitoring;
           break;
 
         case active::Monitoring:
           stateHandlerMonitor();
+          break;
+
+        case active::MenuInitialize:
+          touch.reset(&regionResponder);
+          touch.released += MenuService::touchReleasedHandler;
+          _menu.begin();
+          activeState = active::Menu;
           break;
 
         case active::Menu:

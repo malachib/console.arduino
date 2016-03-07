@@ -33,13 +33,10 @@ public:
 };
 
 
-class MenuService
+class TouchCalibration
 {
-public:
-  static void begin();
-  static void stateHandler();
-};
 
+};
 
 class TouchService
 {
@@ -79,6 +76,17 @@ class AnalogTouchService : public TouchService
 protected:
   virtual Vector3D getPoint();
 };
+
+class MenuService
+{
+public:
+  static void begin();
+  static void stateHandler();
+  static void touchReleasedHandler(TouchService* ts);
+};
+
+
+
 
 extern GUIService gui;
 extern AnalogTouchService touch;

@@ -20,7 +20,9 @@ namespace active
   enum ActiveState
   {
     Initialize,
+    MonitoringInitialize,
     Monitoring,
-    Menu
+    Menu,
+    MenuInitialize
   };
 }
