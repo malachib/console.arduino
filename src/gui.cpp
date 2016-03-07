@@ -177,12 +177,12 @@ void calibrationTouchResponder(TouchService* touch)
 
     case LowerRight:
 #ifdef DEBUG
-      Serial << F("LowerLeft Calibration");
+      Serial << F("LowerRight Calibration");
       Serial.println();
 #endif
       lowerRight = touch->lastPoint;
       calibrationState = Calibrated;
-#ifdef DEBUG
+#ifdef DEBUG2
       Serial << F("LowerLeft Calibration II");
       Serial.println();
 #endif
@@ -216,7 +216,7 @@ void GUIService::stateHandlerCalibration()
 
     case Calibrated:
 #ifdef DEBUG
-      Serial << F("Initialize Calibration");
+      Serial << F("Calibrated UL=") << upperLeft << " and LR=" << lowerRight;
       Serial.println();
 #endif
       state = Active;

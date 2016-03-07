@@ -44,6 +44,31 @@ struct Vector : _Vector<uint16_t>
   Vector() {}
 };
 
+
+// FIX: this one doesn't seem to get picked up :(
+template<class T>
+inline Print& operator <<(Print& obj, _Vector<T>& v)
+{
+  obj.print(v.x);
+  obj.print(',');
+  obj.print(v.y);
+  return obj;
+}
+
+
+//template<class T>
+inline Print& operator <<(Print& obj, Vector& v)
+{
+  obj.print(v.x);
+  obj.print(',');
+  obj.print(v.y);
+  return obj;
+}
+
+
+
+
+
 struct Vector3D : _Vector3D<uint16_t>
 {
   template <class TIn>

@@ -43,8 +43,9 @@ void setup()
   gui.begin();
   monitor.begin();
   //touch.begin(&regionResponder);
-  touch.begin(&mainRegionResponder);
-  touch.released += doMenus;
+  //touch.begin(&mainRegionResponder);
+  touch.begin();
+  //touch.released += doMenus;
   //Scheduler.start(NULL, eventHandler);
   _menu.begin();
 }

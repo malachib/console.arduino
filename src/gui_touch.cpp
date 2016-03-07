@@ -63,42 +63,60 @@ void TouchService::begin(RegionResponder* regionResponder)
 
 void TouchService::stateHandler()
 {
+  static uint32_t lastPressedTime;
   Vector3D p = getPoint();
-
-  lastPoint = p;
 
   // we have some minimum pressure we consider 'valid'
   // pressure of 0 means no pressing!
   if (p.z > ts.pressureThreshhold)
   {
+    // only record points for actual press, it seems (and makes sense)
+    // that release events don't give solid X/Y coordinates
+    lastPoint = p;
+
 #ifdef DEBUG
-    Serial << F("Touch found at: ") << p.x << ',' << p.y << ',' << p.z;
-    Serial.println();
+    static uint8_t thinner = 0;
+
+    if(thinner++ % 100 == 0)
+    {
+      Serial << F("Touch found at: ") << p.x << ',' << p.y << ',' << p.z;
+      Serial.println();
+    }
 #endif
 
     isPressed = true;
+    lastPressedTime = millis();
     // this is a "release" (aka mouseup) event
-    Region* r = regionResponder->find(p);
-    if(r != lastPressed)
+    if(regionResponder)
     {
-      // TODO: once we get an extra parameter for the event system,
-      // this will go more smoothly
-      lastPressed = r;
+      Region* r = regionResponder->find(p);
+      if(r != lastPressed)
+      {
+        // TODO: once we get an extra parameter for the event system,
+        // this will go more smoothly
+        lastPressed = r;
+        pressed(this);
+      }
+    }
+    else
+    {
+      // we can operate without a region responder in which
+      // case all press/releases are put forward unfiltered
+      lastPressed = NULL;
       pressed(this);
     }
   }
   else
   {
-    if(isPressed)
+    // wait 100ms before servicing a button press, I guess this is
+    // kind of a de-bounce code
+    if(isPressed && millis() > (lastPressedTime + 50) )
     {
       // this is a "release" (aka mouseup) event
       //Region* r = regionResponder->find(p);
       auto r = lastPressed;
-      if(r != NULL)
+      if(r || !regionResponder)
       {
-#ifdef DEBUG
-        Serial.println("Got here 1");
-#endif
         // last pressed will already be populated from press
         // *theoretically* it's impossible to have a release
         // on a different position than a press....
@@ -109,7 +127,7 @@ void TouchService::stateHandler()
         Serial.println();
 #endif
       }
-#ifdef DEBUG
+#ifdef DEBUG2
         Serial.println("Got here 2");
 #endif
       isPressed = false;

@@ -54,7 +54,7 @@ public:
   Event pressed;
   Event released;
 
-  void begin(RegionResponder* regionResponder);
+  void begin(RegionResponder* regionResponder = NULL);
   void stateHandler();
 
   // TODO: improve event handler to actually pass in a parameter vs. just the sender
