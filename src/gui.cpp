@@ -2,6 +2,7 @@
 
 #include "gui.h"
 #include "monitor.h"
+#include "states.h"
 #include <fact/lib.h>
 
 
@@ -32,6 +33,14 @@ void SendVerticalScrollStartAddress(uint16_t wVSP);
 
 GUIService::State GUIService::state;
 
+static union
+{
+  calibration::CalibrationState calibrationState;
+  active::ActiveState activeState;
+};
+
+
+
 void GUIService::begin()
 {
 #ifndef ADAFRUIT_ILI9341
@@ -43,6 +52,7 @@ void GUIService::begin()
 #endif
 
   tft.begin();
+  tft.fillScreen(ILI9341_BLACK);
 
   SendVerticalScrollStartAddress(0);
 
@@ -52,6 +62,28 @@ void GUIService::begin()
   }
 #endif
 }
+
+Region regionUp(1, 0,0,240,30);
+Region regionDown(2, 0,290,240,30);
+Region regionEnter(0, 0,31,240,320 - 60);
+
+Region *actionRegions[] =
+{ &regionUp, &regionDown, &regionEnter };
+
+RegionResponder regionResponder(actionRegions, 3);
+
+
+void menuResponder(TouchService* ts)
+{
+#ifdef DEBUG
+  Serial << F("Menu activating");
+  Serial.println();
+#endif
+
+  _menu.begin();
+  activeState = active::Menu;
+}
+
 
 void GUIService::initializeActive()
 {
@@ -69,6 +101,7 @@ void GUIService::initializeActive()
 
   // we're gonna handle this ourselves so that we can scroll properly
   tft.setTextWrap(false);
+  touch.released += menuResponder;
 }
 
 // Using technique described here:
@@ -116,39 +149,6 @@ void doCharScroll()
 
 void touch_test();
 
-namespace calibration
-{
-  // TODO: try to get union to live more happily within state class.
-  // anonymous static union made it unhappy
-  enum CalibrationState
-  {
-    // we begin with a 2 second countdown to recalibrate screen if desired,
-    // if screen is not touched then we proceed straight into monitor mode
-    Initialize,
-    UpperLeft,
-    Middle,
-    LowerRight,
-    Calibrated
-  };
-}
-
-namespace active
-{
-  enum ActiveState
-  {
-    Initialize, // yuck
-    Monitoring
-  };
-}
-
-
-static union
-{
-  calibration::CalibrationState calibrationState;
-  active::ActiveState activeState;
-};
-
-
 void GUIService::stateHandler()
 {
   switch(state)
@@ -168,6 +168,10 @@ void GUIService::stateHandler()
         case active::Monitoring:
           stateHandlerMonitor();
           break;
+
+        case active::Menu:
+          _menu.stateHandler();
+          break;
       }
       break;
 
@@ -177,8 +181,8 @@ void GUIService::stateHandler()
   }
 }
 
-#define CAL_EDGE_OFFSET 10
-#define CAL_CIRCLE_RADIUS 30
+#define CAL_EDGE_OFFSET 20
+#define CAL_CIRCLE_RADIUS 25
 
 
 

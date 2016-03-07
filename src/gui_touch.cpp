@@ -52,10 +52,10 @@ void touch_test()
 
 bool isPressed = false;
 
-void TouchService::begin(RegionResponder* regionResponder)
+void TouchService::setRegionResponder(RegionResponder* regionResponder)
 {
-  released.clear();
-  pressed.clear();
+  //released.clear();
+  //pressed.clear();
 
   this->regionResponder = regionResponder;
 }
