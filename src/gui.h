@@ -11,11 +11,25 @@
 
 class GUIService
 {
+protected:
+  enum State
+  {
+    Initializing,
+    Calibration,
+    Active
+  };
+
 public:
   GUIService() {}
 
   static void begin();
   static void stateHandler();
+  static void stateHandlerMonitor();
+  static void stateHandlerCalibration();
+  static void displayTouchCalibration();
+
+  static State state;
+
 };
 
 
@@ -45,6 +59,7 @@ public:
 
   // TODO: improve event handler to actually pass in a parameter vs. just the sender
   Region* lastPressed;
+  Vector3D lastPoint;
 };
 
 class AnalogTouchService : public TouchService

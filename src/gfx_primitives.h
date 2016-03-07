@@ -35,11 +35,22 @@ struct _Vector3D : public _Vector<TPrecision>
 };
 
 
+struct Vector : _Vector<uint16_t>
+{
+  template <class TIn>
+  Vector(TIn tin) : _Vector<uint16_t>(tin)
+  { }
+
+  Vector() {}
+};
+
 struct Vector3D : _Vector3D<uint16_t>
 {
   template <class TIn>
   Vector3D(TIn tin) : _Vector3D<uint16_t>(tin)
   { }
+
+  Vector3D() {}
 };
 
 template <class TPrecision>

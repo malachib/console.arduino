@@ -65,6 +65,8 @@ void TouchService::stateHandler()
 {
   Vector3D p = getPoint();
 
+  lastPoint = p;
+  
   // we have some minimum pressure we consider 'valid'
   // pressure of 0 means no pressing!
   if (p.z > ts.pressureThreshhold)

@@ -30,6 +30,8 @@ uint16_t iScrollStart = 0;
 
 void SendVerticalScrollStartAddress(uint16_t wVSP);
 
+GUIService::State GUIService::state;
+
 void GUIService::begin()
 {
 #ifndef ADAFRUIT_ILI9341
@@ -113,6 +115,82 @@ void touch_test();
 
 void GUIService::stateHandler()
 {
+  switch(state)
+  {
+    case Active:
+      stateHandlerMonitor();
+      break;
+
+    case Calibration:
+      stateHandlerCalibration();
+      break;
+  }
+}
+
+// TODO: try to get union to live more happily within state class.
+// anonymous static union made it unhappy
+enum CalibrationState
+{
+  // we begin with a 2 second countdown to recalibrate screen if desired,
+  // if screen is not touched then we proceed straight into monitor mode
+  Initialize,
+  UpperLeft,
+  Middle,
+  LowerRight,
+  Calibrated
+};
+
+
+static union
+{
+  CalibrationState calibrationState;
+
+};
+
+
+Vector upperLeft;
+Vector lowerRight;
+
+void calibrationTouchResponder(TouchService* touch)
+{
+  switch(calibrationState)
+  {
+    case UpperLeft:
+      upperLeft = touch->lastPoint;
+      break;
+
+    case LowerRight:
+      lowerRight = touch->lastPoint;
+      break;
+  }
+}
+
+void GUIService::stateHandlerCalibration()
+{
+  switch(calibrationState)
+  {
+    case Initialize:
+      touch.released.clear();
+      touch.released += calibrationTouchResponder;
+      break;
+
+    case UpperLeft:
+      break;
+
+    case Middle:
+      break;
+
+    case LowerRight:
+      break;
+
+    case Calibrated:
+      state = Active;
+      break;
+  }
+}
+
+void GUIService::stateHandlerMonitor()
+{
   while(monitor.stream->available())
   {
     int ch = monitor.stream->read();
@@ -130,6 +208,17 @@ void GUIService::stateHandler()
       tft.print((char)ch);
     }
   }
+}
+
+
+#define CAL_EDGE_OFFSET 10
+#define CAL_CIRCLE_RADIUS 30
+
+void GUIService::displayTouchCalibration()
+{
+  tft.drawCircle(CAL_EDGE_OFFSET,CAL_EDGE_OFFSET,CAL_CIRCLE_RADIUS,0xFFFF);
+  tft.drawCircle(SCREEN_WIDTH - CAL_EDGE_OFFSET,SCREEN_HEIGHT - CAL_EDGE_OFFSET,CAL_CIRCLE_RADIUS,0xFFFF);
+  tft.drawCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, CAL_CIRCLE_RADIUS, 0xFFFF);
 }
 
 
