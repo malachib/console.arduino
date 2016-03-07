@@ -96,6 +96,9 @@ void TouchService::stateHandler()
       auto r = lastPressed;
       if(r != NULL)
       {
+#ifdef DEBUG
+        Serial.println("Got here 1");
+#endif
         // last pressed will already be populated from press
         // *theoretically* it's impossible to have a release
         // on a different position than a press....
@@ -105,7 +108,10 @@ void TouchService::stateHandler()
         Serial << F("Touch released at: ") << p.x << ',' << p.y << ',' << p.z;
         Serial.println();
 #endif
-        }
+      }
+#ifdef DEBUG
+        Serial.println("Got here 2");
+#endif
       isPressed = false;
     }
   }

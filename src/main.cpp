@@ -35,7 +35,7 @@ void doMenus(TouchService* ts)
   // route, we can potentially do away with events entirely... although
   // they are a nice feature to have
   //ts->begin(&regionResponder);
-  menuMode = true;
+  //menuMode = true;
 }
 
 void setup()
