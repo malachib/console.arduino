@@ -4,6 +4,7 @@
 #include "monitor.h"
 #include "states.h"
 #include <fact/lib.h>
+#include <Console.h>
 
 
 
@@ -24,6 +25,10 @@ SubState subState;
 
 void GUIService::begin()
 {
+#ifdef DEBUG2
+  cout << F("GUIService begin");
+  cout.println();
+#endif
 #ifndef ADAFRUIT_ILI9341
   // chinese clone version needs LCD explitly turned on, although
   // we could probably tie the line high - WITH A RESISTOR - if I understand my
@@ -42,6 +47,9 @@ void GUIService::begin()
     tft.println("Couldn't start touchscreen controller");
   }
 #endif
+#ifdef DEBUG2
+  cout.println("GUIService end");
+#endif
 }
 
 Region regionUp(1, 0,0,240,60);
@@ -57,8 +65,8 @@ RegionResponder regionResponder(actionRegions, 3);
 void menuResponder(TouchService* ts)
 {
 #ifdef DEBUG
-  Serial << F("Menu activating");
-  Serial.println();
+  cout << F("Menu activating");
+  cout.println();
 #endif
 
   subState.active = active::MenuInitialize;
@@ -127,13 +135,15 @@ void doCharScroll()
   }
 }
 
-void touch_test();
 
 void GUIService::stateHandler()
 {
   switch(state)
   {
     case Initializing:
+#ifdef DEBUG
+      cout.println("GUIService initializing");
+#endif
       state = Calibration;
       break;
 
@@ -170,6 +180,7 @@ void GUIService::stateHandler()
       stateHandlerCalibration();
       break;
   }
+  yield();
 }
 
 
@@ -193,7 +204,6 @@ void GUIService::stateHandlerMonitor()
     }
   }
 }
-
 
 void ScrollScreen(uint16_t px) {
   // Try simple...
