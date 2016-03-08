@@ -10,6 +10,16 @@
 
 
 
+class GenericInterval : public util::IScheduledWithInterval<uint16_t>
+{
+  void (*f)();
+  
+public:
+  GenericInterval(void (*f)()) : f(f) {}
+  
+  void setInterval(uint16_t i) { wakeupInterval = i; }
+};
+
 class Countdown : public util::IScheduledWithInterval<uint16_t>
 {
   uint8_t secondsLeft = 5;
@@ -17,21 +27,21 @@ class Countdown : public util::IScheduledWithInterval<uint16_t>
 public:
   Countdown() : IScheduledWithInterval(1000) {  }
   
+  uint8_t getSecondsLeft() { return secondsLeft; }
+  
   void execute() override
   {
-    //cout.println("Testing 1 2 3");
+    // don't draw 0, because screen is just gonna immediately clear
+    if(--secondsLeft == 0) return;
+    
+    tft.setCursor(14 * COLUMN_WIDTH, ROW_HEIGHT * 12);
+    // erase previous character
+    tft.fillRect(14 * COLUMN_WIDTH, ROW_HEIGHT * 12, COLUMN_WIDTH, ROW_HEIGHT, 0);
+    tft.print(secondsLeft);
   }
 };
 
 
-void SendVerticalScrollStartAddress(uint16_t wVSP);
-/*
-static union
-{
-  calibration::CalibrationState calibrationState;
-  active::ActiveState activeState;
-};
-*/
 
 
 #define CAL_EDGE_OFFSET 20
@@ -56,17 +66,6 @@ void calibrationTouchResponder(TouchService* _touch)
 }
 
 Countdown countdown;
-
-struct InitializingState
-{
-  uint32_t timeInitialized;
-  uint8_t lastDrawnSecond;
-};
-
-static union
-{
-  InitializingState initializingState;
-};
 
 void GUIService::stateHandlerCalibration()
 {
@@ -93,37 +92,19 @@ void GUIService::stateHandlerCalibration()
         tft << F("or wait for default");
         tft.println();
         tft << F("Starting in ");
+
+        sm.add(countdown);
       }
       
-      initializingState.timeInitialized = millis();
-
       break;
 
     case calibration::UpperLeftWaiting:
       if(eeprom.hasProfile())
       {
-        // TODO: revamp and use old state machine framework code, perfect
-        // use case right here
-        // render second countdown here, rather inefficiently I might add
-        uint32_t target = initializingState.timeInitialized + 4000;
-        uint32_t current = millis();
-        if(current > target)
+        if(countdown.getSecondsLeft() == 0)
         {
-          // time has elapsed, use EEPROM stored value
+          sm.remove(countdown);
           subState.calibration = calibration::Calibrated;
-        }
-        else
-        {
-          uint32_t remaining = target - current;
-          auto remainingSeconds = 1+(remaining / 1000);
-          if(remainingSeconds != initializingState.lastDrawnSecond)
-          {
-            tft.setCursor(14 * COLUMN_WIDTH, ROW_HEIGHT * 11);
-            // erase previous character
-            tft.fillRect(14 * COLUMN_WIDTH, ROW_HEIGHT * 11, COLUMN_WIDTH, ROW_HEIGHT, 0);
-            tft.print(remainingSeconds);
-            initializingState.lastDrawnSecond = remainingSeconds;
-          }
         }
       }
       break;
