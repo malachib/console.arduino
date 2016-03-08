@@ -14,30 +14,11 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
 GUIService gui;
 
-#ifdef DEBUG
-#define ROW_HEIGHT 16
-#define COLUMN_WIDTH 12
-#else
-#define ROW_HEIGHT 8
-#define COLUMN_WIDTH 6
-#endif
-#define SCREEN_HEIGHT 320
-#define SCREEN_WIDTH 240
-
-#define ROWS (SCREEN_HEIGHT / ROW_HEIGHT)
-#define COLUMNS (SCREEN_WIDTH / COLUMN_WIDTH)
-
 uint16_t iScrollStart = 0;
-
-void SendVerticalScrollStartAddress(uint16_t wVSP);
 
 GUIService::State GUIService::state;
 
-static union
-{
-  calibration::CalibrationState calibrationState;
-  active::ActiveState activeState;
-};
+SubState subState;
 
 
 
@@ -54,7 +35,7 @@ void GUIService::begin()
   tft.begin();
   tft.fillScreen(ILI9341_BLACK);
 
-  SendVerticalScrollStartAddress(0);
+  tft.setScrollStart(0);
 
 #ifndef ANALOG_TOUCHSCREEN
   if (!ts.begin()) {
@@ -80,7 +61,7 @@ void menuResponder(TouchService* ts)
   Serial.println();
 #endif
 
-  activeState = active::MenuInitialize;
+  subState.active = active::MenuInitialize;
 }
 
 
@@ -157,15 +138,15 @@ void GUIService::stateHandler()
       break;
 
     case Active:
-      switch(activeState)
+      switch(subState.active)
       {
         case active::Initialize:
           initializeActive();
-          activeState = active::MonitoringInitialize;
+          subState.active = active::MonitoringInitialize;
           break;
 
         case active::MonitoringInitialize:
-          activeState = active::Monitoring;
+          subState.active = active::Monitoring;
           break;
 
         case active::Monitoring:
@@ -176,7 +157,7 @@ void GUIService::stateHandler()
           touch.reset(&regionResponder);
           touch.released += MenuService::touchReleasedHandler;
           _menu.begin();
-          activeState = active::Menu;
+          subState.active = active::Menu;
           break;
 
         case active::Menu:
@@ -191,82 +172,6 @@ void GUIService::stateHandler()
   }
 }
 
-#define CAL_EDGE_OFFSET 20
-#define CAL_CIRCLE_RADIUS 25
-
-
-
-void calibrationTouchResponder(TouchService* _touch)
-{
-  switch(calibrationState)
-  {
-    case calibration::UpperLeft:
-      touch.screenBounds.origin = _touch->lastPoint;
-      calibrationState = calibration::LowerRight;
-#ifdef DEBUG
-      Serial << F("UpperLeft Calibration");
-      Serial.println();
-#endif
-      tft.fillScreen(ILI9341_BLACK);
-      tft.drawCircle(SCREEN_WIDTH - CAL_EDGE_OFFSET,SCREEN_HEIGHT - CAL_EDGE_OFFSET,CAL_CIRCLE_RADIUS,0xFFFF);
-
-      break;
-
-    case calibration::LowerRight:
-      touch.screenBounds.size = _touch->lastPoint - touch.screenBounds.origin;
-
-#ifdef DEBUG2
-      Serial << F("LowerRight Calibration: size (adj) = ") <<
-        touchCalibration.screenBounds.size;
-      Serial.println();
-#endif
-
-      calibrationState = calibration::Calibrated;
-#ifdef DEBUG2
-      Serial << F("LowerLeft Calibration II");
-      Serial.println();
-#endif
-      break;
-  }
-}
-
-void GUIService::stateHandlerCalibration()
-{
-  switch(calibrationState)
-  {
-    case calibration::Initialize:
-#ifdef DEBUG
-      Serial << F("Initialize Calibration");
-      Serial.println();
-#endif
-      touch.released.clear();
-      touch.released += calibrationTouchResponder;
-      tft.drawCircle(CAL_EDGE_OFFSET,CAL_EDGE_OFFSET,CAL_CIRCLE_RADIUS,0xFFFF);
-      calibrationState = calibration::UpperLeft;
-      break;
-
-    case calibration::UpperLeft:
-      break;
-
-    case calibration::Middle:
-      break;
-
-    case calibration::LowerRight:
-      break;
-
-    case calibration::Calibrated:
-#ifdef DEBUG
-      Serial << F("Calibrated OR=") << touch.screenBounds.origin;
-      Serial << F(" and SZ=") << touch.screenBounds.size;
-      Serial.println();
-#endif
-      touch.calibrated = true;
-      touch.released.clear();
-      state = Active;
-      activeState = active::Initialize;
-      break;
-  }
-}
 
 void GUIService::stateHandlerMonitor()
 {
@@ -295,39 +200,5 @@ void ScrollScreen(uint16_t px) {
   iScrollStart += px;
   if (iScrollStart == SCREEN_HEIGHT)
     iScrollStart = px;
-  SendVerticalScrollStartAddress(iScrollStart);
-}
-
-void WriteData16(uint16_t w) {
-  tft.writedata(w >> 8);
-  tft.writedata(w & 0xFF);     // XSTART
-
-}
-
-void SendVerticalScrollDefinition(uint16_t wTFA, uint16_t wBFA) {
-  // Did not pass in VSA as TFA+VSA=BFA must equal 320
-  tft.writecommand(0x33); // Vertical Scroll definition.
-  WriteData16(wTFA);   //
-  WriteData16(320-(wTFA+wBFA));
-  WriteData16(wBFA);
-}
-
-#define ILI9340_CASET ILI9341_CASET
-#define ILI9340_PASET ILI9341_PASET
-#define ILI9340_RAMWR ILI9341_RAMWR
-
-void SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
-
-  tft.writecommand(ILI9340_CASET); // Column addr set
-  WriteData16(x0);   // XSTART
-  WriteData16(x1);   // XEND
-  tft.writecommand(ILI9340_PASET); // Row addr set
-  WriteData16(y0);   // YSTART
-  WriteData16(y1);   // YEND
-  tft.writecommand(ILI9340_RAMWR); // write to RAM
-}
-
-void SendVerticalScrollStartAddress(uint16_t wVSP) {
-  tft.writecommand(0x37); // Vertical Scroll definition.
-  WriteData16(wVSP);   //
+  tft.setScrollStart(iScrollStart);
 }

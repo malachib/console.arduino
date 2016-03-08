@@ -1,3 +1,4 @@
+#pragma once
 
 namespace calibration
 {
@@ -26,3 +27,9 @@ namespace active
     MenuInitialize
   };
 }
+
+union SubState
+{
+  calibration::CalibrationState calibration;
+  active::ActiveState active;
+};

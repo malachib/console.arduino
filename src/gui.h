@@ -9,6 +9,8 @@
 #include "gfx_primitives.h"
 #include "gfx_touch.h"
 
+#include "states.h"
+
 class GUIService
 {
 protected:
@@ -85,9 +87,23 @@ public:
 };
 
 
+#ifdef DEBUG
+#define ROW_HEIGHT 16
+#define COLUMN_WIDTH 12
+#else
+#define ROW_HEIGHT 8
+#define COLUMN_WIDTH 6
+#endif
+#define SCREEN_HEIGHT 320
+#define SCREEN_WIDTH 240
+
+#define ROWS (SCREEN_HEIGHT / ROW_HEIGHT)
+#define COLUMNS (SCREEN_WIDTH / COLUMN_WIDTH)
+
 
 
 extern GUIService gui;
 extern AnalogTouchService touch;
 extern Adafruit_ILI9341 tft;
 extern MenuService _menu;
+extern SubState subState;

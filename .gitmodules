@@ -16,3 +16,6 @@
 [submodule "lib/Adafruit_SleepyDog"]
 	path = lib/Adafruit_SleepyDog
 	url = git@github.com:malachib/Adafruit_SleepyDog.git
+[submodule "lib/Arduino-Scheduler"]
+	path = lib/Arduino-Scheduler
+	url = git@github.com:malachib/Arduino-Scheduler.git
