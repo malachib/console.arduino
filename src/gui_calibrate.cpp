@@ -1,9 +1,11 @@
 #include <SPI.h> // stokes auto-lib resolver for platformio
+#include <fact/lib.h>
 
 #include "gui.h"
 #include "monitor.h"
 #include "states.h"
-#include <fact/lib.h>
+
+#include "main.h"
 
 
 
@@ -26,19 +28,20 @@ void calibrationTouchResponder(TouchService* _touch)
 {
   switch(subState.calibration)
   {
-    case calibration::UpperLeft:
+    case calibration::UpperLeftWaiting:
       touch.screenBounds.origin = _touch->lastPoint;
-      subState.calibration = calibration::LowerRight;
+      subState.calibration = calibration::UpperLeftPressed;
 #ifdef DEBUG
       Serial << F("UpperLeft Calibration");
       Serial.println();
 #endif
-      tft.fillScreen(ILI9341_BLACK);
+      //tft.fillScreen(ILI9341_BLACK);
+      tft.fillRect(0,0,CAL_CIRCLE_RADIUS * 3,CAL_CIRCLE_RADIUS * 3,0);
       tft.drawCircle(SCREEN_WIDTH - CAL_EDGE_OFFSET,SCREEN_HEIGHT - CAL_EDGE_OFFSET,CAL_CIRCLE_RADIUS,0xFFFF);
 
       break;
 
-    case calibration::LowerRight:
+    case calibration::LowerRightWaiting:
       touch.screenBounds.size = _touch->lastPoint - touch.screenBounds.origin;
 
 #ifdef DEBUG2
@@ -47,7 +50,7 @@ void calibrationTouchResponder(TouchService* _touch)
       Serial.println();
 #endif
 
-      subState.calibration = calibration::Calibrated;
+      subState.calibration = calibration::LowerRightPressed;
 #ifdef DEBUG2
       Serial << F("LowerLeft Calibration II");
       Serial.println();
@@ -68,16 +71,35 @@ void GUIService::stateHandlerCalibration()
       touch.released.clear();
       touch.released += calibrationTouchResponder;
       tft.drawCircle(CAL_EDGE_OFFSET,CAL_EDGE_OFFSET,CAL_CIRCLE_RADIUS,0xFFFF);
-      subState.calibration = calibration::UpperLeft;
+      subState.calibration = calibration::UpperLeftWaiting;
+
+      tft.setTextColor(ILI9341_WHITE);
+      tft.setCursor(0, ROW_HEIGHT * 10);
+      tft.setTextSize(2);
+      tft << F("Touch to calibrate");
+      if(eeprom.hasProfile())
+      {
+        tft.println();
+        tft << F("Using profile in 3 seconds");
+      }
+
       break;
 
-    case calibration::UpperLeft:
+    case calibration::UpperLeftWaiting:
+      break;
+      
+    case calibration::UpperLeftPressed:
+      subState.calibration = calibration::LowerRightWaiting;
+      break;
+      
+    case calibration::LowerRightPressed:
+      subState.calibration = calibration::Calibrated;
       break;
 
     case calibration::Middle:
       break;
 
-    case calibration::LowerRight:
+    case calibration::LowerRightWaiting:
       break;
 
     case calibration::Calibrated:
