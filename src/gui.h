@@ -14,6 +14,7 @@
 class GUIService
 {
 protected:
+public:
   enum State
   {
     Initializing,
@@ -21,7 +22,6 @@ protected:
     Active
   };
 
-public:
   GUIService() {}
 
   static void begin();

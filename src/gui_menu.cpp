@@ -53,6 +53,11 @@ MENU(subMenu2,"Sub-Menu",
 );
 */
 
+void _screenCalibration()
+{
+  gui.state = GUIService::Calibration;
+}
+
 
 CHOOSE(bps, subMenuBPS,"BPS: ",
   VALUE("2400",2400,setBPS),
@@ -65,6 +70,7 @@ CHOOSE(bps, subMenuBPS,"BPS: ",
 
 MENU(mainMenu,"Sistema",
   OP("A",nothing),
+  OP("Screen Calibration",_screenCalibration),
   //OP("B",nothing),
   SUBMENU(subMenuBPS)
 );

@@ -10,7 +10,9 @@
 util::ScheduleManager sm;
 
 
-#define MULTITASK
+// multitask not really needed, everything is being managed
+// with nonblocking state handlers
+//#define MULTITASK
 
 void setup()
 {

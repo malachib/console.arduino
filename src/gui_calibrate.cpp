@@ -22,7 +22,7 @@ public:
 
 class Countdown : public util::IScheduledWithInterval<uint16_t>
 {
-  uint8_t secondsLeft = 5;
+  uint8_t secondsLeft = 4;
   
 public:
   Countdown() : IScheduledWithInterval(1000) {  }
