@@ -1,5 +1,6 @@
 #include <SPI.h> // stokes auto-lib resolver for platformio
 #include <fact/lib.h>
+#include <Console.h>
 
 #include "gui.h"
 #include "monitor.h"
@@ -40,14 +41,25 @@ void calibrationTouchResponder(TouchService* _touch)
   }
 }
 
+struct InitializingState
+{
+  uint32_t timeInitialized;
+  uint8_t lastDrawnSecond;
+};
+
+static union
+{
+  InitializingState initializingState;
+};
+
 void GUIService::stateHandlerCalibration()
 {
   switch(subState.calibration)
   {
     case calibration::Initialize:
 #ifdef DEBUG
-      Serial << F("Initialize Calibration");
-      Serial.println();
+      cout << F("Initialize Calibration");
+      cout.println();
 #endif
       touch.released.clear();
       touch.released += calibrationTouchResponder;
@@ -61,12 +73,40 @@ void GUIService::stateHandlerCalibration()
       if(eeprom.hasProfile())
       {
         tft.println();
-        tft << F("Using profile in 3 seconds");
+        tft << F("Starting in ");
       }
+      
+      initializingState.timeInitialized = millis();
 
       break;
 
     case calibration::UpperLeftWaiting:
+      if(eeprom.hasProfile())
+      {
+        // TODO: revamp and use old state machine framework code, perfect
+        // use case right here
+        // render second countdown here, rather inefficiently I might add
+        uint32_t target = initializingState.timeInitialized + 4000;
+        uint32_t current = millis();
+        if(current > target)
+        {
+          // time has elapsed, use EEPROM stored value
+          subState.calibration = calibration::Calibrated;
+        }
+        else
+        {
+          uint32_t remaining = target - current;
+          auto remainingSeconds = 1+(remaining / 1000);
+          if(remainingSeconds != initializingState.lastDrawnSecond)
+          {
+            tft.setCursor(14 * COLUMN_WIDTH, ROW_HEIGHT * 11);
+            // erase previous character
+            tft.fillRect(14 * COLUMN_WIDTH, ROW_HEIGHT * 11, COLUMN_WIDTH, ROW_HEIGHT, 0);
+            tft.print(remainingSeconds);
+            initializingState.lastDrawnSecond = remainingSeconds;
+          }
+        }
+      }
       break;
       
     case calibration::UpperLeftPressed:
@@ -89,9 +129,9 @@ void GUIService::stateHandlerCalibration()
 
     case calibration::Calibrated:
 #ifdef DEBUG
-      Serial << F("Calibrated OR=") << touch.screenBounds.origin;
-      Serial << F(" and SZ=") << touch.screenBounds.size;
-      Serial.println();
+      cout << F("Calibrated OR=") << touch.screenBounds.origin;
+      cout << F(" and SZ=") << touch.screenBounds.size;
+      cout.println();
 #endif
       touch.calibrated = true;
       touch.released.clear();
