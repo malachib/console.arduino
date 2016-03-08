@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Service.h>
+#include <taskmanager.h>
 
 class EEPROMService 
 {
@@ -25,3 +26,4 @@ public:
 };
 
 extern EEPROMService eeprom;
+extern util::ScheduleManager sm;

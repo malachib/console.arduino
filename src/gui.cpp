@@ -1,10 +1,13 @@
 #include <SPI.h> // stokes auto-lib resolver for platformio
+#include <taskmanager.h>
+#include <fact/lib.h>
+#include <Console.h>
 
 #include "gui.h"
 #include "monitor.h"
 #include "states.h"
-#include <fact/lib.h>
-#include <Console.h>
+
+#include "main.h"
 
 
 
@@ -21,11 +24,9 @@ GUIService::State GUIService::state;
 
 SubState subState;
 
-
-
 void GUIService::begin()
 {
-#ifdef DEBUG2
+#ifdef DEBUG
   cout << F("GUIService begin");
   cout.println();
 #endif
@@ -78,13 +79,12 @@ void GUIService::initializeActive()
   tft.fillScreen(ILI9341_BLACK);
   tft.setCursor(0, 0);
   tft.setTextColor(ILI9341_WHITE);
-#ifdef DEBUG
   tft.setTextSize(2);
+#ifdef DEBUG
   tft << F("Available rows:") << ROWS;
   tft.println();
 #else
-  tft.setTextSize(1);
-  tft.println(F("Ready to listen"));
+  tft.println(F("Listening"));
 #endif
 
   // we're gonna handle this ourselves so that we can scroll properly
@@ -138,6 +138,9 @@ void doCharScroll()
 
 void GUIService::stateHandler()
 {
+  // make our schedule manager GUI "thread" specific, for now
+  sm.execute();
+
   switch(state)
   {
     case Initializing:

@@ -10,6 +10,20 @@
 
 
 
+class Countdown : public util::IScheduledWithInterval<uint16_t>
+{
+  uint8_t secondsLeft = 5;
+  
+public:
+  Countdown() : IScheduledWithInterval(1000) {  }
+  
+  void execute() override
+  {
+    //cout.println("Testing 1 2 3");
+  }
+};
+
+
 void SendVerticalScrollStartAddress(uint16_t wVSP);
 /*
 static union
@@ -41,6 +55,8 @@ void calibrationTouchResponder(TouchService* _touch)
   }
 }
 
+Countdown countdown;
+
 struct InitializingState
 {
   uint32_t timeInitialized;
@@ -67,11 +83,14 @@ void GUIService::stateHandlerCalibration()
       subState.calibration = calibration::UpperLeftWaiting;
 
       tft.setTextColor(ILI9341_WHITE);
-      tft.setCursor(0, ROW_HEIGHT * 10);
+      tft.setCursor(0, ROW_HEIGHT * 8);
       tft.setTextSize(2);
       tft << F("Touch to calibrate");
       if(eeprom.hasProfile())
       {
+        tft.println();
+        tft.println();
+        tft << F("or wait for default");
         tft.println();
         tft << F("Starting in ");
       }
@@ -140,6 +159,7 @@ void GUIService::stateHandlerCalibration()
       
       if(!eeprom.hasProfile())
         eeprom.save();
+        
       break;
   }
 }

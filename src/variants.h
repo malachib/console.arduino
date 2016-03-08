@@ -9,4 +9,4 @@
 // #define XPT2046
 // #define STMPE610
 
-#define DEBUG
+//#define DEBUG

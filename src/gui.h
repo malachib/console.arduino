@@ -86,8 +86,9 @@ public:
   static void touchReleasedHandler(TouchService* ts);
 };
 
+#define LARGE_FONT
 
-#ifdef DEBUG
+#ifdef LARGE_FONT
 #define ROW_HEIGHT 16
 #define COLUMN_WIDTH 12
 #else

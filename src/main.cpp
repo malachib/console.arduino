@@ -1,9 +1,13 @@
 #include <Arduino.h>
+#include <taskmanager.h>
 #include "gui.h"
 #include "monitor.h"
 #include "main.h"
 #include <Scheduler.h>
 #include <Console.h>
+
+
+util::ScheduleManager sm;
 
 
 #define MULTITASK
