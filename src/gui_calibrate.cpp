@@ -31,30 +31,11 @@ void calibrationTouchResponder(TouchService* _touch)
     case calibration::UpperLeftWaiting:
       touch.screenBounds.origin = _touch->lastPoint;
       subState.calibration = calibration::UpperLeftPressed;
-#ifdef DEBUG
-      Serial << F("UpperLeft Calibration");
-      Serial.println();
-#endif
-      //tft.fillScreen(ILI9341_BLACK);
-      tft.fillRect(0,0,CAL_CIRCLE_RADIUS * 3,CAL_CIRCLE_RADIUS * 3,0);
-      tft.drawCircle(SCREEN_WIDTH - CAL_EDGE_OFFSET,SCREEN_HEIGHT - CAL_EDGE_OFFSET,CAL_CIRCLE_RADIUS,0xFFFF);
-
       break;
 
     case calibration::LowerRightWaiting:
       touch.screenBounds.size = _touch->lastPoint - touch.screenBounds.origin;
-
-#ifdef DEBUG2
-      Serial << F("LowerRight Calibration: size (adj) = ") <<
-        touchCalibration.screenBounds.size;
-      Serial.println();
-#endif
-
       subState.calibration = calibration::LowerRightPressed;
-#ifdef DEBUG2
-      Serial << F("LowerLeft Calibration II");
-      Serial.println();
-#endif
       break;
   }
 }
@@ -89,6 +70,10 @@ void GUIService::stateHandlerCalibration()
       break;
       
     case calibration::UpperLeftPressed:
+      // erase upper left circle
+      tft.fillRect(0,0,CAL_CIRCLE_RADIUS * 3,CAL_CIRCLE_RADIUS * 3,0);
+      // draw lower right circle
+      tft.drawCircle(SCREEN_WIDTH - CAL_EDGE_OFFSET,SCREEN_HEIGHT - CAL_EDGE_OFFSET,CAL_CIRCLE_RADIUS,0xFFFF);
       subState.calibration = calibration::LowerRightWaiting;
       break;
       
@@ -112,6 +97,9 @@ void GUIService::stateHandlerCalibration()
       touch.released.clear();
       state = Active;
       subState.active = active::Initialize;
+      
+      if(!eeprom.hasProfile())
+        eeprom.save();
       break;
   }
 }
