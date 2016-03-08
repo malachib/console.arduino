@@ -19,6 +19,7 @@ public:
   {
     Initializing,
     Calibration,
+    Menu,
     Active
   };
 
@@ -35,56 +36,6 @@ public:
 };
 
 
-class TouchCalibration
-{
-public:
-  static Rectangle screenBounds;
-  static bool calibrated;
-
-  TouchCalibration() {}
-};
-
-class TouchService : public TouchCalibration
-{
-  RegionResponder* regionResponder;
-
-  LOCAL_EVENT(TouchService);
-  //DECLARE_EVENT(Region) pressed;
-  //DECLARE_EVENT(Region) released;
-protected:
-  virtual Vector3D getPoint() = 0;
-public:
-  Event pressed;
-  Event released;
-
-  void setRegionResponder(RegionResponder* regionResponder = NULL);
-  void begin() { setRegionResponder(); }
-  void reset(RegionResponder* regionResponder = NULL)
-  {
-    pressed.clear();
-    released.clear();
-    setRegionResponder(regionResponder);
-  }
-  void stateHandler();
-
-  // TODO: improve event handler to actually pass in a parameter vs. just the sender
-  Region* lastPressed;
-  Vector3D lastPoint;
-};
-
-class AnalogTouchService : public TouchService
-{
-protected:
-  virtual Vector3D getPoint();
-};
-
-class MenuService
-{
-public:
-  static void begin();
-  static void stateHandler();
-  static void touchReleasedHandler(TouchService* ts);
-};
 
 #define LARGE_FONT
 

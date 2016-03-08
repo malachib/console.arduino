@@ -30,8 +30,18 @@ namespace active
   };
 }
 
+namespace __menu
+{
+  enum MenuState
+  {
+    Initialize,
+    Deactivate
+  };
+}
+
 union SubState
 {
   calibration::CalibrationState calibration;
   active::ActiveState active;
+  __menu::MenuState menuState;
 };

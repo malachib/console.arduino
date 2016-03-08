@@ -168,13 +168,17 @@ void GUIService::stateHandler()
 
         case active::MenuInitialize:
           touch.reset(&regionResponder);
+          touch.touching += MenuService::touchTouchingHandler;
           touch.released += MenuService::touchReleasedHandler;
           _menu.begin();
           subState.active = active::Menu;
+          // TODO: need to have exit menu handler to remove/clear event handlers
           break;
 
         case active::Menu:
+          // FIX: don't know how to detect when we're done with the menu
           _menu.stateHandler();
+          //subState.active = active::MonitoringInitialize;
           break;
       }
       break;

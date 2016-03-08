@@ -4,6 +4,8 @@
 #include <menuFields.h>
 #include <genericKeyboard.h>
 
+#include <Console.h>
+
 #include "gui.h"
 #include "gfx_touch.h"
 
@@ -55,7 +57,7 @@ MENU(subMenu2,"Sub-Menu",
 
 void _screenCalibration()
 {
-  gui.state = GUIService::Calibration;
+  //gui.state = GUIService::Calibration;
 }
 
 
@@ -87,19 +89,35 @@ void MenuService::begin()
   gfx.top = 2;
 }
 
-int menuCommand;
+volatile int menuCommand;
+
+void MenuService::touchTouchingHandler(TouchService* ts)
+{
+  // hold for 3 seconds to exit
+  if(millis() > (ts->lastPressedTime + 3000))
+  {
+#ifdef DEBUG
+    cout.println("Long pressed");
+#endif    
+    menuCommand = menu::escCode;
+  }
+}
 
 void MenuService::touchReleasedHandler(TouchService *ts)
 {
+  // if we have an escape code from a long press, then just exit
+  if(menuCommand == menu::escCode) return;
+  
   Region* region = ts->lastPressed;
   uint8_t regionCode = region->regionCode;
-
+  
   switch(regionCode)
   {
     // FIX: somehow my up/down codes are getting reversed
     // up
     case 2:
-      menuCommand = menu::upCode;
+      //menuCommand = menu::upCode;
+      menuCommand = menu::escCode;
       break;
     // down
     case 1:
@@ -124,5 +142,5 @@ genericKeyboard forcedKeyIn(getMenuCommand);
 
 void MenuService::stateHandler()
 {
-  mainMenu.poll(gfx, forcedKeyIn);
+  mainMenu.poll(gfx, forcedKeyIn, true);
 }

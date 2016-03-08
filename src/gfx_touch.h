@@ -67,3 +67,64 @@ public:
   // only call this when touch threshold has been reached, determined externally
   void touch(_Vector3D<uint16_t> vector);
 };
+
+
+class TouchCalibration
+{
+public:
+  static Rectangle screenBounds;
+  static bool calibrated;
+
+  TouchCalibration() {}
+};
+
+class TouchService : public TouchCalibration
+{
+  RegionResponder* regionResponder;
+
+  LOCAL_EVENT(TouchService);
+  //DECLARE_EVENT(Region) pressed;
+  //DECLARE_EVENT(Region) released;
+protected:
+  virtual Vector3D getPoint() = 0;
+public:
+  // fires continuously when touches are present
+  Event touching;
+  
+  // fires when a new region is pressed
+  Event pressed;
+  
+  // fires when finger is lifted off previously pressed region
+  Event released;
+
+  void setRegionResponder(RegionResponder* regionResponder = NULL);
+  void begin() { setRegionResponder(); }
+  void reset(RegionResponder* regionResponder = NULL)
+  {
+    pressed.clear();
+    released.clear();
+    setRegionResponder(regionResponder);
+  }
+  void stateHandler();
+
+  // TODO: improve event handler to actually pass in a parameter vs. just the sender
+  Region* lastPressed;
+  uint32_t lastPressedTime;
+  uint32_t lastTouchedTime;
+  Vector3D lastPoint;
+};
+
+class AnalogTouchService : public TouchService
+{
+protected:
+  virtual Vector3D getPoint();
+};
+
+class MenuService
+{
+public:
+  static void begin();
+  static void stateHandler();
+  static void touchReleasedHandler(TouchService* ts);
+  static void touchTouchingHandler(TouchService* ts);
+};

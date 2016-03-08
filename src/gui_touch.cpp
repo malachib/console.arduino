@@ -47,7 +47,6 @@ void TouchService::setRegionResponder(RegionResponder* regionResponder)
 
 void TouchService::stateHandler()
 {
-  static uint32_t lastPressedTime;
   Vector3D p = getPoint();
 
   // we have some minimum pressure we consider 'valid'
@@ -98,8 +97,16 @@ void TouchService::stateHandler()
     }
 #endif
 
-    isPressed = true;
-    lastPressedTime = millis();
+    lastTouchedTime = millis();
+    
+    if(!isPressed)
+    {
+      lastPressedTime = lastTouchedTime;
+      isPressed = true;
+    }
+    
+    touching(this);
+    
     // this is a "press" (aka mousedown) event
     if(regionResponder)
     {
@@ -125,7 +132,7 @@ void TouchService::stateHandler()
   {
     // wait 100ms before servicing a button press, I guess this is
     // kind of a de-bounce code
-    if(isPressed && millis() > (lastPressedTime + 50) )
+    if(isPressed && millis() > (lastTouchedTime + 50) )
     {
       // this is a "release" (aka mouseup) event
       //Region* r = regionResponder->find(p);
