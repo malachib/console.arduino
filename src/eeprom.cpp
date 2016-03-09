@@ -1,5 +1,3 @@
-#ifdef __AVR__
-#include <EEPROM.h>
 #include <fact/lib.h>
 #include <Console.h>
 
@@ -15,6 +13,9 @@ EEPROMService::Profile EEPROMService::profile;
 #define ADDR_SCREENBOUNDS (ADDR_PROFILE) + sizeof(Profile)
 
 EEPROMService eeprom;
+
+#ifdef __AVR__
+#include <EEPROM.h>
 
 void EEPROMService::load()
 {
@@ -41,4 +42,14 @@ void EEPROMService::save()
 }
 
 
+#else
+void EEPROMService::load()
+{
+  profile._isActive = 1; // remember it's reversed, so this means inanctive
+}
+
+void EEPROMService::save()
+{
+  
+}
 #endif
