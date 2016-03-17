@@ -4,4 +4,4 @@
 // with nonblocking state handlers
 //#define MULTITASK
 
-//#define FEATURE_CONSOLE
+#define FEATURE_CONSOLE

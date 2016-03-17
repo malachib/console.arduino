@@ -154,7 +154,7 @@ void TouchService::stateHandler()
 #endif
       }
 #ifdef DEBUG2
-        Serial.println("Got here 2");
+        Serial.println(F("TouchService stateHandler finish"));
 #endif
       isPressed = false;
     }
