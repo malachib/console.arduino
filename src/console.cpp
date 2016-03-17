@@ -31,7 +31,7 @@ CREATE_MENUFUNCTION(consoleDiagnostic3, setBPS2, "Diagnostic for scroll behavior
 
 ConsoleService::MainMenu::MainMenu()
 {
-  add(consoleSetBPS);
+  //add(consoleSetBPS);
   add(consoleDiagnostic1);
   add(consoleDiagnostic3);
 }

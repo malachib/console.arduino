@@ -31,6 +31,9 @@ public:
   
   void execute() override
   {
+#ifdef DEBUG2
+    cout << F("Countdown: seconds left = ") << secondsLeft;
+#endif
     // don't draw 0, because screen is just gonna immediately clear
     if(--secondsLeft == 0) return;
     
