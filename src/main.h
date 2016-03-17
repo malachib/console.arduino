@@ -2,6 +2,9 @@
 
 #include <Service.h>
 #include <taskmanager.h>
+#include <Console.h>
+
+#include "features.h"
 
 class EEPROMService 
 {
@@ -30,5 +33,25 @@ private:
   static Profile profile;
 };
 
+
+class ConsoleService
+{
+  class MainMenu : public util::Menu
+  {
+    
+  } menu;
+  
+  util::ConsoleMenu console;
+  
+public:
+  ConsoleService() : console(&menu)
+  {
+    
+  }
+  
+  void stateHandler() { console.handler(); }
+};
+
+extern ConsoleService console;
 extern EEPROMService eeprom;
 extern util::ScheduleManager sm;

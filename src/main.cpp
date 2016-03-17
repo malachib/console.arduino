@@ -10,10 +10,6 @@
 util::ScheduleManager sm;
 
 
-// multitask not really needed, everything is being managed
-// with nonblocking state handlers
-//#define MULTITASK
-
 void setup()
 {
 #ifdef DEBUG
@@ -39,6 +35,9 @@ void setup()
 void loop()
 {
   touch.stateHandler();
+#ifdef FEATURE_CONSOLE
+  console.stateHandler();
+#endif
 #ifndef MULTITASK
   gui.stateHandler();
 #else
