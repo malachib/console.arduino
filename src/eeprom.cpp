@@ -42,14 +42,22 @@ void EEPROMService::save()
 }
 
 
-#else
+#elif SAMD_SERIES
+
+#include <FlashStorage.h>
+
+FlashStorage(flash_profile, EEPROMService::Profile);
+
 void EEPROMService::load()
 {
-  profile._isActive = 1; // remember it's reversed, so this means inanctive
+  flash_profile.read(&profile);
+  //profile._isActive = 1; // remember it's reversed, so this means inanctive
 }
 
 void EEPROMService::save()
 {
-  
+  flash_profile.write(profile);
 }
+#else
+#error MPU not supported
 #endif

@@ -19,3 +19,6 @@
 [submodule "lib/Arduino-Scheduler"]
 	path = lib/Arduino-Scheduler
 	url = git@github.com:malachib/Arduino-Scheduler.git
+[submodule "lib/FlashStorage"]
+	path = lib/FlashStorage
+	url = https://github.com/cmaglie/FlashStorage.git
