@@ -38,6 +38,8 @@ class ConsoleService
 {
   class MainMenu : public util::Menu
   {
+  public:
+    MainMenu();
     
   } menu;
   

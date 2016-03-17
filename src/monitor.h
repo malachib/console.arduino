@@ -12,6 +12,10 @@ class SerialMonitorService :
 {
 public:
   static void begin();
+  static void setBPS(uint32_t bps)
+  {
+    stream->begin(bps);
+  }
 };
 
 extern SerialMonitorService monitor;
