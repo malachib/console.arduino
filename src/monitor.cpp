@@ -14,5 +14,5 @@ void SerialMonitorService::begin()
     stream = &Serial;
   #endif
 
-  stream->begin(115200);
+  setBPS(115200);
 }

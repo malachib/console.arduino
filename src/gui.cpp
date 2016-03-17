@@ -193,9 +193,9 @@ void GUIService::stateHandler()
 
 void GUIService::stateHandlerMonitor()
 {
-  while(monitor.stream->available())
+  while(monitor.getStream()->available())
   {
-    int ch = monitor.stream->read();
+    int ch = monitor.getStream()->read();
     if(ch == 13)
     {
       doCharScroll();
