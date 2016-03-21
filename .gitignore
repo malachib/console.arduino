@@ -3,3 +3,6 @@
 # manually symbolic link/copy this depending on desired config from conf folder
 # because so far I haven't mastered multi-targeting with only one INI
 platformio.ini
+
+.gcc-flags.json
+.clang_complete
