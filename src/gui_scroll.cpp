@@ -4,10 +4,9 @@ uint16_t iScrollStart = 0;
 
 
 void ScrollScreen(uint16_t px) {
-  // Try simple...
   iScrollStart += px;
   if (iScrollStart == SCREEN_HEIGHT)
-    iScrollStart = px;
+    iScrollStart = 0;
   tft.setScrollStart(iScrollStart);
 }
 

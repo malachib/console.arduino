@@ -158,9 +158,19 @@ void GUIService::stateHandlerMonitor()
     {
       doCharScroll();
     }
+    // for now, totally eat LF and treat CR as CRLF, cuz
+    // otherwise it ends up double-spacing.  Odd, cuz
+    // tft.print on its own shouldn't scroll and 
+    // cursor_x should only scroll ocassionally but somehow
+    // it double-spaces all the time
+    else if(ch == 10)
+    {
+      
+    }
     else
     {
-      // TODO: next up is word wrap handling
+      // here we assume a printable character
+      // FIX: Is this todo still relevant? TODO: next up is word wrap handling
       uint8_t cursor_x = (tft.getCursorX() / COLUMN_WIDTH);
       if(cursor_x == COLUMNS)
         doCharScroll();
