@@ -6,7 +6,7 @@ using namespace util;
 
 void doCharScroll();
 
-void gfx_diagnostic_scroll1(int dummyParam = 0)
+void gfx_diagnostic_scroll1()
 {
   tft.fillScreen(ILI9341_BLACK);
 
@@ -33,6 +33,12 @@ void gfx_diagnostic_scroll1(int dummyParam = 0)
     delay(250);
     doCharScroll();
   }
+}
+
+void gfx_diagnostic_scroll2()
+{
+  tft.fillScreen(ILI9341_BLACK);
+  tft.setScrollStart(0);
 
   tft.setCursor(0,0);
   for(int i = 0; i < ROWS; i++)
@@ -48,9 +54,4 @@ void gfx_diagnostic_scroll1(int dummyParam = 0)
     /// doCharScroll does println for us
     doCharScroll();
   }
-}
-
-void gfx_diagnostic_scroll2()
-{
-  
 }

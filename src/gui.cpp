@@ -18,8 +18,6 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
 GUIService gui;
 
-uint16_t iScrollStart = 0;
-
 GUIService::State GUIService::state;
 
 SubState subState;
@@ -96,46 +94,6 @@ void GUIService::initializeActive()
 // https://forums.adafruit.com/viewtopic.php?f=47&t=56039&sid=d490b4c0369e06d31d4d4f18727cb152
 void ScrollScreen(uint16_t px);
 
-void doCharScroll()
-{
-  static bool scrollMode = false;
-
-  uint8_t cursor_y = (tft.getCursorY() / ROW_HEIGHT); // we'll operate in rows, not pixels
-
-#ifdef DEBUG
-  Serial << F("scrollMode = ") << scrollMode;
-  Serial << F(" cursor_y = ") << cursor_y;
-  Serial << F(" cursor_y [actual] = ") << tft.getCursorY();
-  Serial << F(" scrollStart = ") << iScrollStart;
-  Serial.println();
-#endif
-
-  if(cursor_y >= (ROWS - 1))
-  {
-    tft.setCursor(0, 0);
-    cursor_y = 0;
-    scrollMode = true;
-  }
-  else
-  {
-    tft.println();
-    cursor_y++;
-  }
-
-  if(scrollMode)
-  {
-    // hardware scroll moves the actual screen origin around,
-    // so we have to move the fillrect here to keep it stationary (on the bottom)
-    // on the actual screen
-    //tft.fillRect(0, 319 - ROW_HEIGHT, 239, 319, 0xFFFF);
-
-    // erase next line
-    tft.fillRect(0, cursor_y * ROW_HEIGHT, SCREEN_WIDTH, ROW_HEIGHT, 0);
-    ScrollScreen(ROW_HEIGHT);
-  }
-}
-
-
 void GUIService::stateHandler()
 {
   // make our schedule manager GUI "thread" specific, for now
@@ -210,12 +168,4 @@ void GUIService::stateHandlerMonitor()
       tft.print((char)ch);
     }
   }
-}
-
-void ScrollScreen(uint16_t px) {
-  // Try simple...
-  iScrollStart += px;
-  if (iScrollStart == SCREEN_HEIGHT)
-    iScrollStart = px;
-  tft.setScrollStart(iScrollStart);
 }

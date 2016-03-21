@@ -52,6 +52,7 @@ public:
 #define ROWS (SCREEN_HEIGHT / ROW_HEIGHT)
 #define COLUMNS (SCREEN_WIDTH / COLUMN_WIDTH)
 
+void doCharScroll();
 
 
 extern GUIService gui;

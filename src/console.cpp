@@ -33,13 +33,13 @@ void menuDiagnostic()
   dummyService = &service2;
 }
 
-void gfx_diagnostic_scroll1(int dummyParam);
+void gfx_diagnostic_scroll1();
 void gfx_diagnostic_scroll2();
 
 
 CREATE_MENUFUNCTION(consoleSetBPS, setBPS, "Change BPS for target device");
-CREATE_MENUFUNCTION(consoleDiagnostic1, gfx_diagnostic_scroll1, "Diagnostic for scroll behavior");
-//CREATE_MENUFUNCTION(consoleDiagnostic2, gfx_diagnostic_scroll2, "Diagnostic for scroll behavior");
+//CREATE_MENUFUNCTION(consoleDiagnostic1, gfx_diagnostic_scroll1, "Diagnostic for scroll behavior");
+CREATE_MENUFUNCTION(consoleDiagnostic1, gfx_diagnostic_scroll2, "Diagnostic for scroll behavior");
 //CREATE_MENUFUNCTION(consoleDiagnostic3, setBPS2, "Diagnostic for scroll behavior");
 CREATE_MENUFUNCTION(consoleMenuDiagnostic, menuDiagnostic, "Menu Diagnostic");
 CREATE_MENUFUNCTION(consoleDummyCommand, dummyCommand, "echoes back input #");
