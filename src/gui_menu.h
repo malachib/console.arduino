@@ -2,7 +2,7 @@ class MenuService
 {
 public:
   static void begin();
-  static void stateHandler();
+  static bool stateHandler();
   static void touchReleasedHandler(TouchService* ts);
   static void touchTouchingHandler(TouchService* ts);
 };

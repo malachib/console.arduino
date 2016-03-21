@@ -111,6 +111,9 @@ void MenuService::touchTouchingHandler(TouchService* ts)
   #endif
       menuCommand = menu::enterCode;
       inMenu = true;
+      // FIX: kludge to make sure stateHandler doesn't immediately abort since
+      // the menu gets rendered before a release is registered
+      lastReleasedTime = millis();
     }
   }
 }
@@ -164,17 +167,19 @@ int getMenuCommand()
 genericKeyboard forcedKeyIn(getMenuCommand);
 
 
-void MenuService::stateHandler()
+bool MenuService::stateHandler()
 {
   if(inMenu)
   {
-    /*
+    // if 7s go by and nothing was pressed, we auto-exit
     if(millis() > lastReleasedTime + 7000)
     {
-      menuCommand = menu::escCode;
       inMenu = false;
-    }*/
+      return false;
+    }
       
     mainMenu.poll(gfx, forcedKeyIn, true);
   }
+  
+  return true;
 }

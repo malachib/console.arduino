@@ -26,7 +26,8 @@ namespace active
     MonitoringInitialize,
     Monitoring,
     Menu,
-    MenuInitialize
+    MenuInitialize,
+    MenuClose
   };
 }
 

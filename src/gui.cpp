@@ -134,9 +134,17 @@ void GUIService::stateHandler()
           break;
 
         case active::Menu:
-          // FIX: don't know how to detect when we're done with the menu
-          _menu.stateHandler();
-          //subState.active = active::MonitoringInitialize;
+          // return of false value means we are done with the menu
+          if(!_menu.stateHandler())
+            subState.active = active::MenuClose;
+          break;
+          
+        case active::MenuClose:
+          //touch.touching -= MenuService::touchTouchingHandler;
+          //touch.released -= MenuService::touchReleasedHandler;
+          tft.fillScreen(ILI9341_BLACK);
+          tft.setCursor(0, 0);
+          subState.active = active::MonitoringInitialize;
           break;
       }
       break;
