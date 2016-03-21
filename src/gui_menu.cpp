@@ -89,22 +89,39 @@ void MenuService::begin()
   gfx.top = 2;
 }
 
-volatile int menuCommand;
+volatile int menuCommand = -1;
+volatile bool inMenu = false;
+uint32_t lastReleasedTime;
 
 void MenuService::touchTouchingHandler(TouchService* ts)
 {
-  // hold for 3 seconds to exit
+  // hold for 3 seconds to enter menu
   if(millis() > (ts->lastPressedTime + 3000))
   {
 #ifdef DEBUG
-    cout.println("Long pressed");
-#endif    
-    menuCommand = menu::escCode;
+    //cout.println("Long pressed");
+#endif
+    // switch into inMenu and generate one menuCommand.  
+    // we don't want to keep reassigning menuCommand, because
+    // that will enter the menu over and over
+    if(!inMenu)
+    {
+  #ifdef DEBUG2
+      cout.println("Menu activating II");
+  #endif
+      menuCommand = menu::enterCode;
+      inMenu = true;
+    }
   }
 }
 
 void MenuService::touchReleasedHandler(TouchService *ts)
 {
+  lastReleasedTime = millis();
+  
+  // only watch for keypresses if we've entered menu mode
+  if(!inMenu) return;
+  
   // if we have an escape code from a long press, then just exit
   if(menuCommand == menu::escCode) return;
   
@@ -116,8 +133,8 @@ void MenuService::touchReleasedHandler(TouchService *ts)
     // FIX: somehow my up/down codes are getting reversed
     // up
     case 2:
-      //menuCommand = menu::upCode;
-      menuCommand = menu::escCode;
+      menuCommand = menu::upCode;
+      //menuCommand = menu::escCode;
       break;
     // down
     case 1:
@@ -133,6 +150,13 @@ void MenuService::touchReleasedHandler(TouchService *ts)
 int getMenuCommand()
 {
   int temp = menuCommand;
+#ifdef DEBUG
+  if(temp != -1)
+  {
+    cout << F("Touchscreen command: ") << temp;
+    cout.println();
+  }
+#endif
   menuCommand = -1;
   return temp;
 }
@@ -142,5 +166,15 @@ genericKeyboard forcedKeyIn(getMenuCommand);
 
 void MenuService::stateHandler()
 {
-  mainMenu.poll(gfx, forcedKeyIn, true);
+  if(inMenu)
+  {
+    /*
+    if(millis() > lastReleasedTime + 7000)
+    {
+      menuCommand = menu::escCode;
+      inMenu = false;
+    }*/
+      
+    mainMenu.poll(gfx, forcedKeyIn, true);
+  }
 }

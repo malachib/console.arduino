@@ -119,12 +119,3 @@ class AnalogTouchService : public TouchService
 protected:
   virtual Vector3D getPoint();
 };
-
-class MenuService
-{
-public:
-  static void begin();
-  static void stateHandler();
-  static void touchReleasedHandler(TouchService* ts);
-  static void touchTouchingHandler(TouchService* ts);
-};

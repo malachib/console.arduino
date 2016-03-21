@@ -8,6 +8,7 @@
 
 #include "gfx_primitives.h"
 #include "gfx_touch.h"
+#include "gui_menu.h"
 
 #include "states.h"
 
